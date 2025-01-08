@@ -33,6 +33,7 @@ class ScrapZutApiCommand extends Command
         $urlBuilder = new ZutUrlBuilder($url);
         $zutDataUpdater = new ZutDataUpdater($client, $urlBuilder, $output);
         $zutDataUpdater->updateZutData();
+        $zutDataUpdater->updateTeachersScheduleData();
 
         return Command::SUCCESS;
     }

@@ -6,6 +6,7 @@ namespace App\Service;
 
 use App\Enum\ZutEndpoints;
 use App\Enum\ZutDataKinds;
+use App\Enum\ZutScheduleDataKinds;
 use DateTime;
 use DateTimeInterface;
 
@@ -24,10 +25,18 @@ class ZutUrlBuilder
             $this->baseUrl, ZutEndpoints::Data->value, $dataKind->value, urlencode($query));
     }
 
-    public function buildScheduleUrl(ZutDataKinds $dataKind, string $query, DateTime $start, DateTime $end): string
+    public function buildScheduleUrl(array $data, DateTime $start, DateTime $end): string
     {
-        return sprintf('%s/%s?kind=%s&query=%s&start=%s&end=%s',
-            $this->baseUrl, ZutEndpoints::Schedule->value, $dataKind->value, urlencode($query),
-            urlencode($start->format(DateTimeInterface::ATOM)), urlencode($end->format(DateTimeInterface::ATOM)));
+        $url = sprintf('%s/%s?', $this->baseUrl, ZutEndpoints::Schedule->value);
+
+        foreach($data as $kind => $query){
+            $url .= sprintf('%s=%s&', $kind, urlencode($query));
+        }
+
+        $url .= sprintf('start=%s&end=%s',
+            urlencode($start->format(DateTimeInterface::ATOM)),
+            urlencode($end->format(DateTimeInterface::ATOM)));
+
+        return $url;
     }
 }
