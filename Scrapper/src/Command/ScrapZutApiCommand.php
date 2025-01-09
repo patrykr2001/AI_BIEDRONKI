@@ -25,7 +25,7 @@ class ScrapZutApiCommand extends Command
     {
         $this->zutDataUpdater->updateOutput($output);
         $this->zutDataUpdater->updateZutData();
-//        $this->zutDataUpdater->updateTeachersScheduleData();
+        $this->zutDataUpdater->updateTeachersScheduleData();
 
         return Command::SUCCESS;
     }

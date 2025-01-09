@@ -4,10 +4,13 @@ namespace App\Service;
 
 use App\Config\ConfigReader;
 use App\Entity\DataUpdateLog;
+use App\Entity\Lesson;
 use App\Entity\Room;
 use App\Entity\Subject;
 use App\Entity\Teacher;
 use App\Enum\DataUpdateTypes;
+use App\Enum\LessonForms;
+use App\Enum\LessonStatuses;
 use App\Enum\ZutDataKinds;
 use App\Enum\ZutScheduleDataKinds;
 use App\Utils\DateHelper;
@@ -23,9 +26,11 @@ class ZutDataUpdater{
     private TeacherService $teacherService;
     private SubjectService $subjectService;
     private DataUpdateLogService $dataUpdateLogService;
+    private LessonService $lessonService;
 
     public function __construct(HttpClientInterface $client, RoomService $roomService, TeacherService $teacherService,
-                                SubjectService $subjectService, DataUpdateLogService $dataUpdateLogService)
+                                SubjectService $subjectService, DataUpdateLogService $dataUpdateLogService,
+                                LessonService  $lessonService)
     {
         $url = (new ConfigReader())->getApiBaseUrl();
         $this->client = $client;
@@ -34,6 +39,7 @@ class ZutDataUpdater{
         $this->teacherService = $teacherService;
         $this->subjectService = $subjectService;
         $this->dataUpdateLogService = $dataUpdateLogService;
+        $this->lessonService = $lessonService;
     }
 
     public function updateOutput(OutputInterface $output): void
@@ -59,10 +65,14 @@ class ZutDataUpdater{
             } else {
                 $this->output->writeln('<info>Updating monthly data...</info>');
                 $this->updateSpecificZutData(ZutDataKinds::Teachers);
-//          $this->updateSpecificZutData(ZutDataKinds::Groups);
+//                  $this->updateSpecificZutData(ZutDataKinds::Groups);
                 $this->updateSpecificZutData(ZutDataKinds::Subjects);
                 $this->updateSpecificZutData(ZutDataKinds::Rooms);
             }
+            $lastMontlyDataUpdate = new DataUpdateLog();
+            $lastMontlyDataUpdate->setType(DataUpdateTypes::Monthly);
+            $lastMontlyDataUpdate->setUpdateDate(DateHelper::getCurrentDay());
+            $this->dataUpdateLogService->save($lastMontlyDataUpdate);
         }
 
         $lastWeeklyDataUpdate = $this->dataUpdateLogService->findLastByType(DataUpdateTypes::Weekly);
@@ -82,11 +92,15 @@ class ZutDataUpdater{
                 $this->output->writeln('<info>Updating weekly data...</info>');
                 $this->updateTeachersScheduleData();
             }
+            $lastWeeklyDataUpdate = new DataUpdateLog();
+            $lastWeeklyDataUpdate->setType(DataUpdateTypes::Weekly);
+            $lastWeeklyDataUpdate->setUpdateDate(DateHelper::getCurrentWeek()[0]);
+            $this->dataUpdateLogService->save($lastWeeklyDataUpdate);
         }
     }
 
     public function updateTeachersScheduleData(): void{
-        $teachers = ['Burak Dariusz', 'Karczmarczyk Artur' ];
+        $teachers = array_map(fn($teacher) => $teacher->getName(), $this->teacherService->getAllTeachers());
         $dates = (new ConfigReader())->getDateRange();
         $this->updateSpecificTeachersScheduleData($teachers, new DateTime($dates['start']), new DateTime($dates['end']));
     }
@@ -110,8 +124,6 @@ class ZutDataUpdater{
 
 //        $processedData = $this->processData($data);
 //        file_put_contents($kind->name.'.json', $processedData);
-//
-//        $this->output->writeln('<info>Data successfully fetched and saved '.$kind->name.' data.</info>');
 
         $this->output->writeln('<info>Processing ' . $kind->name . ' data...</info>');
 
@@ -133,7 +145,8 @@ class ZutDataUpdater{
             case ZutDataKinds::Subjects:
                 foreach ($processedData as $item) {
                     $subject = new Subject();
-                    $subject->setName($item['item']);
+                    $value = $this->getSubstringBeforeParenthesis($item['item']);
+                    $subject->setName($value);
                     $objects[] = $subject;
                 }
                 $this->subjectService->saveNewSubjects($objects);
@@ -151,10 +164,21 @@ class ZutDataUpdater{
         $this->output->writeln('<info>Data successfully fetched and saved '.$kind->name.' data.</info>');
     }
 
+    function getSubstringBeforeParenthesis(string $input): string
+    {
+        $position = strpos($input, '(');
+        if ($position === false) {
+            return trim($input);
+        }
+        return trim(substr($input, 0, $position));
+    }
+
     private function updateSpecificTeachersScheduleData(array $teachers, DateTime $start, DateTime $end): void
     {
-        foreach ($teachers as $teacher) {
-            $data = [ZutScheduleDataKinds::Teachers->value=>$teacher];
+        foreach ($teachers as $teacherString) {
+            $data = [ZutScheduleDataKinds::Teachers->value => $teacherString];
+
+            $this->output->writeln('<info>Fetching ' . $teacherString . ' schedule data from API...</info>');
 
             $response = $this->client->request('GET', $this->urlBuilder
                 ->buildScheduleUrl($data, $start, $end), [
@@ -164,16 +188,76 @@ class ZutDataUpdater{
             ]);
 
             if ($response->getStatusCode() !== 200) {
-                $this->output->writeln('<error>Failed to fetch '.$teacher.' schedule data from API.</error>');
+                $this->output->writeln('<error>Failed to fetch ' . $teacherString . ' schedule data from API.</error>');
                 continue;
             }
+            $this->output->writeln('<info>Successfully fetched ' . $teacherString . ' schedule data from API.</info>');
 
             $data = $response->getContent();
-            $processedData = $this->processData($data);
-            file_put_contents($teacher.'.json', $processedData);
+//            $processedData = $this->processData($data);
+//            file_put_contents($teacher.'.json', $processedData);
+            $this->output->writeln('<info>Processing ' . $teacherString . ' schedule data...</info>');
 
-            $this->output->writeln('<info>Data successfully fetched and saved '.$teacher.' schedule data.</info>');
+            $processedData = $this->processJsonData($data);
+
+            $this->output->writeln('<info>Saving ' . $teacherString . ' schedule data...</info>');
+
+            $objects = [];
+
+            foreach ($processedData as $item) {
+                $room = $this->roomService->getRoomByName($item['room']);
+                $subject = $this->subjectService->getSubjectByName($item['subject']);
+                $teacher = $this->teacherService->getTeacherByName($item['worker']);
+                $lessonForm = $this->mapLessonForm($item['lesson_form']);
+                $lessonStatus = $this->mapLessonStatus($item['status_item']);
+                $hours = $item['hours'];
+                $startDate = new DateTime($item['start_date']);
+                $endDate = new DateTime($item['end_date']);
+
+                $teacherCover = null;
+                if ($item['worker_cover'] !== null && $item['worker_cover'] !== '') {
+                    $teacherCover = $this->teacherService->getTeacherByName($item['worker_cover']);
+                }
+
+                $lesson = new Lesson();
+                $lesson->setStartDate($startDate);
+                $lesson->setEndDate($endDate);
+                $lesson->setHours($hours);
+                $lesson->setRoomId($room->getId());
+                $lesson->setSubjectId($subject->getId());
+                $lesson->setWorkerId($teacher->getId());
+                $lesson->setLessonForm($lessonForm);
+                $lesson->setLessonStatus($lessonStatus);
+                if ($teacherCover !== null) {
+                    $lesson->setWorkerCoverId($teacherCover->getId());
+                }
+                $objects[] = $lesson;
+            }
+            $this->lessonService->saveNewLessons($objects);
+
+            $this->output->writeln('<info>Data successfully fetched and saved ' . $teacherString . ' schedule data.</info>');
         }
+    }
+
+    private function mapLessonForm(string $lessonForm): LessonForms
+    {
+        return match ($lessonForm) {
+            'laboratorium' => LessonForms::Laboratory,
+            'seminarium' => LessonForms::Seminar,
+            'projekt' => LessonForms::Project,
+            'zaliczenie' => LessonForms::Pass,
+            'zaliczenie zdalne' => LessonForms::RemotePass,
+            'zajęcia zdalne' => LessonForms::Remote,
+            default => LessonForms::Lecture,
+        };
+    }
+
+    private function mapLessonStatus(string $lessonStatus): LessonStatuses
+    {
+        return match ($lessonStatus) {
+            'odwołane' => LessonStatuses::Cancelled,
+            default => LessonStatuses::Normal,
+        };
     }
 
     private function processData(string $jsonContent): string

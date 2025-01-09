@@ -16,28 +16,35 @@ class LessonRepository extends ServiceEntityRepository
         parent::__construct($registry, Lesson::class);
     }
 
-    //    /**
-    //     * @return Lesson[] Returns an array of Lesson objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('l')
-    //            ->andWhere('l.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('l.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * Saves a Lesson entity.
+     *
+     * @param Lesson $lesson
+     */
+    public function save(Lesson $lesson): void
+    {
+        $this->_em->persist($lesson);
+        $this->_em->flush();
+    }
 
-    //    public function findOneBySomeField($value): ?Lesson
-    //    {
-    //        return $this->createQueryBuilder('l')
-    //            ->andWhere('l.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    /**
+     * Finds a Lesson by its name.
+     *
+     * @param string $name
+     * @return Lesson|null
+     */
+    public function findLessonByName(string $name): ?Lesson
+    {
+        return $this->findOneBy(['name' => $name]);
+    }
+
+    /**
+     * Finds all Lesson entities.
+     *
+     * @return Lesson[]
+     */
+    public function findAllLessons(): array
+    {
+        return $this->findAll();
+    }
 }
