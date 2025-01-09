@@ -17,13 +17,18 @@ class ZutDataUpdater{
     private ZutUrlBuilder $urlBuilder;
     private OutputInterface $output;
     private RoomService $roomService;
+    private TeacherService $teacherService;
+    private SubjectService $subjectService;
 
-    public function __construct(HttpClientInterface $client, RoomService $roomService)
+    public function __construct(HttpClientInterface $client, RoomService $roomService, TeacherService $teacherService,
+                                SubjectService      $subjectService)
     {
         $url = (new ConfigReader())->getApiBaseUrl();
         $this->client = $client;
         $this->urlBuilder = new ZutUrlBuilder($url);
         $this->roomService = $roomService;
+        $this->teacherService = $teacherService;
+        $this->subjectService = $subjectService;
     }
 
     public function updateOutput(OutputInterface $output): void
@@ -32,9 +37,9 @@ class ZutDataUpdater{
     }
 
     public function updateZutData(): void{
-//        $this->updateSpecificZutData(ZutDataKinds::Teachers);
+        $this->updateSpecificZutData(ZutDataKinds::Teachers);
 //        $this->updateSpecificZutData(ZutDataKinds::Groups);
-//        $this->updateSpecificZutData(ZutDataKinds::Subjects);
+        $this->updateSpecificZutData(ZutDataKinds::Subjects);
         $this->updateSpecificZutData(ZutDataKinds::Rooms);
     }
 
@@ -81,6 +86,7 @@ class ZutDataUpdater{
                     $teacher->setName($item['item']);
                     $objects[] = $teacher;
                 }
+                $this->teacherService->saveNewTeachers($objects);
                 break;
             case ZutDataKinds::Subjects:
                 foreach ($processedData as $item) {
@@ -88,6 +94,7 @@ class ZutDataUpdater{
                     $subject->setName($item['item']);
                     $objects[] = $subject;
                 }
+                $this->subjectService->saveNewSubjects($objects);
                 break;
             case ZutDataKinds::Rooms:
                 foreach ($processedData as $item) {

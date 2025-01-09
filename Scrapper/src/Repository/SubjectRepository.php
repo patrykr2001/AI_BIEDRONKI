@@ -16,28 +16,61 @@ class SubjectRepository extends ServiceEntityRepository
         parent::__construct($registry, Subject::class);
     }
 
-    //    /**
-    //     * @return Subject[] Returns an array of Subject objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('s.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * @return Subject[] Returns an array of Subject objects
+     */
+    public function findAllSubjects(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->getQuery()
+            ->getResult();
+    }
 
-    //    public function findOneBySomeField($value): ?Subject
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    /**
+     * @return Subject|null Returns a Subject object or null
+     */
+    public function findSubjectById(int $id): ?Subject
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * @return Subject|null Returns a Subject object or null
+     */
+    public function findSubjectByName(string $name): ?Subject
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.name = :name')
+            ->setParameter('name', $name)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * Saves a Subject entity
+     */
+    public function saveSubject(Subject $subject): void
+    {
+        $_em = $this->getEntityManager();
+
+        $_em->persist($subject);
+        $_em->flush();
+    }
+
+    /**
+     * Saves a list of Subject entities
+     */
+    public function saveSubjects(array $subjects): void
+    {
+        $_em = $this->getEntityManager();
+
+        foreach ($subjects as $subject) {
+            $_em->persist($subject);
+        }
+        $_em->flush();
+    }
 }
