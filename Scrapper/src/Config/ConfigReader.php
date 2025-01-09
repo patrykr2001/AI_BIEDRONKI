@@ -1,6 +1,6 @@
-namespace App\Config;
-
 <?php
+
+namespace App\Config;
 
 class ConfigReader
 {
