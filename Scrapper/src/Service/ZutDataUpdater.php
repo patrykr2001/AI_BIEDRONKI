@@ -2,9 +2,9 @@
 
 namespace App\Service;
 
-use App\Enum\ZutEndpoints;
 use App\Enum\ZutDataKinds;
 use App\Enum\ZutScheduleDataKinds;
+use ConfigReader;
 use DateTime;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -29,7 +29,8 @@ class ZutDataUpdater{
 
     public function updateTeachersScheduleData(): void{
         $teachers = ['Burak Dariusz', 'Karczmarczyk Artur' ];
-        $this->updateSpecificTeachersScheduleData($teachers, new DateTime('2025-01-01'), new DateTime('2025-01-31'));
+        $dates = (new ConfigReader())->getDateRange();
+        $this->updateSpecificTeachersScheduleData($teachers, new DateTime($dates['start']), new DateTime($dates['end']));
     }
 
     private function updateSpecificZutData(ZutDataKinds $kind): void
