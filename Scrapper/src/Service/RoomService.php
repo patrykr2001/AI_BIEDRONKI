@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Room;
 use App\Repository\RoomRepository;
 
 class RoomService
