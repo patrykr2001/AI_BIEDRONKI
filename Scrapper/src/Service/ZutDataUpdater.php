@@ -69,12 +69,12 @@ class ZutDataUpdater{
         if ($lastWeeklyDataUpdate === null) {
             $lastWeeklyDataUpdate = new DataUpdateLog();
             $lastWeeklyDataUpdate->setType(DataUpdateTypes::Weekly);
-            $lastWeeklyDataUpdate->setUpdateDate(DateHelper::getCurrentWeek()['start']);
+            $lastWeeklyDataUpdate->setUpdateDate(DateHelper::getCurrentWeek()[0]);
             $this->dataUpdateLogService->save($lastWeeklyDataUpdate);
         }
         if ($lastWeeklyDataUpdate !== null) {
             $lastUpdateDate = $lastWeeklyDataUpdate->getUpdateDate();
-            $currentDate = DateHelper::getCurrentWeek()['start'];
+            $currentDate = DateHelper::getCurrentWeek()[0];
             $diff = $currentDate->diff($lastUpdateDate);
             if ($diff->days < 7) {
                 $this->output->writeln('<info>There is no need to update weekly data.</info>');

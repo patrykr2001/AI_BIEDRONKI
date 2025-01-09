@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Enum\ZutEndpoints;
 use App\Enum\ZutDataKinds;
-use App\Enum\ZutScheduleDataKinds;
+use App\Enum\ZutEndpoints;
 use DateTime;
 use DateTimeInterface;
 
