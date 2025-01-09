@@ -7,7 +7,7 @@ use DateTime;
 
 class DateHelper
 {
-    public function getCurrentWeek(): array
+    public static function getCurrentWeek(): array
     {
         $startOfWeek = new DateTime();
         $startOfWeek->setISODate((int)$startOfWeek->format('o'), (int)$startOfWeek->format('W'), 1);
@@ -17,7 +17,7 @@ class DateHelper
         return [$startOfWeek, $endOfWeek];
     }
 
-    public function getNextWeek(): array
+    public static function getNextWeek(): array
     {
         $startOfNextWeek = new DateTime();
         $startOfNextWeek->setISODate((int)$startOfNextWeek->format('o'), (int)$startOfNextWeek->format('W') + 1, 1);
@@ -27,12 +27,12 @@ class DateHelper
         return [$startOfNextWeek, $endOfNextWeek];
     }
 
-    public function getCurrentDay(): DateTime
+    public static function getCurrentDay(): DateTime
     {
         return new DateTime();
     }
 
-    public function getCurrentMonth(): array
+    public static function getCurrentMonth(): array
     {
         $startOfMonth = new DateTime('first day of this month');
         $endOfMonth = new DateTime('last day of this month');

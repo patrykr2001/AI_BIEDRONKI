@@ -25,7 +25,7 @@ class DataUpdateLogRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('d')
             ->andWhere('d.type = :type')
             ->setParameter('type', $type)
-            ->orderBy('d.updatedAt', 'DESC')
+            ->orderBy('d.updateDate', 'DESC')
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
