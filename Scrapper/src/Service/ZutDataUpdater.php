@@ -2,9 +2,12 @@
 
 namespace App\Service;
 
+use App\Config\ConfigReader;
+use App\Entity\Room;
+use App\Entity\Subject;
+use App\Entity\Teacher;
 use App\Enum\ZutDataKinds;
 use App\Enum\ZutScheduleDataKinds;
-use ConfigReader;
 use DateTime;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -13,17 +16,25 @@ class ZutDataUpdater{
     private HttpClientInterface $client;
     private ZutUrlBuilder $urlBuilder;
     private OutputInterface $output;
+    private RoomService $roomService;
 
-    public function __construct(HttpClientInterface $client, ZutUrlBuilder $urlBuilder, OutputInterface $output){
+    public function __construct(HttpClientInterface $client, RoomService $roomService)
+    {
+        $url = (new ConfigReader())->getApiBaseUrl();
         $this->client = $client;
-        $this->urlBuilder = $urlBuilder;
+        $this->urlBuilder = new ZutUrlBuilder($url);
+        $this->roomService = $roomService;
+    }
+
+    public function updateOutput(OutputInterface $output): void
+    {
         $this->output = $output;
     }
 
     public function updateZutData(): void{
-        $this->updateSpecificZutData(ZutDataKinds::Teachers);
+//        $this->updateSpecificZutData(ZutDataKinds::Teachers);
 //        $this->updateSpecificZutData(ZutDataKinds::Groups);
-        $this->updateSpecificZutData(ZutDataKinds::Subjects);
+//        $this->updateSpecificZutData(ZutDataKinds::Subjects);
         $this->updateSpecificZutData(ZutDataKinds::Rooms);
     }
 
@@ -35,6 +46,7 @@ class ZutDataUpdater{
 
     private function updateSpecificZutData(ZutDataKinds $kind): void
     {
+        $this->output->writeln('<info>Fetching ' . $kind->name . ' data from API...</info>');
         $response = $this->client->request('GET', $this->urlBuilder->buildDataUrl($kind, ''), [
             'headers' => [
                 'Accept-Charset' => 'UTF-8',
@@ -45,10 +57,47 @@ class ZutDataUpdater{
             $this->output->writeln('<error>Failed to fetch '.$kind->name.' data from API.</error>');
             return;
         }
+        $this->output->writeln('<info>Successfully fetched ' . $kind->name . ' data from API.</info>');
 
         $data = $response->getContent();
-        $processedData = $this->processData($data);
-        file_put_contents($kind->name.'.json', $processedData);
+
+//        $processedData = $this->processData($data);
+//        file_put_contents($kind->name.'.json', $processedData);
+//
+//        $this->output->writeln('<info>Data successfully fetched and saved '.$kind->name.' data.</info>');
+
+        $this->output->writeln('<info>Processing ' . $kind->name . ' data...</info>');
+
+        $processedData = $this->processJsonData($data);
+
+        $this->output->writeln('<info>Saving ' . $kind->name . ' data...</info>');
+
+        $objects = [];
+
+        switch ($kind) {
+            case ZutDataKinds::Teachers:
+                foreach ($processedData as $item) {
+                    $teacher = new Teacher();
+                    $teacher->setName($item['item']);
+                    $objects[] = $teacher;
+                }
+                break;
+            case ZutDataKinds::Subjects:
+                foreach ($processedData as $item) {
+                    $subject = new Subject();
+                    $subject->setName($item['item']);
+                    $objects[] = $subject;
+                }
+                break;
+            case ZutDataKinds::Rooms:
+                foreach ($processedData as $item) {
+                    $room = new Room();
+                    $room->setName($item['item']);
+                    $objects[] = $room;
+                }
+                $this->roomService->saveNewRooms($objects);
+                break;
+        }
 
         $this->output->writeln('<info>Data successfully fetched and saved '.$kind->name.' data.</info>');
     }
@@ -88,5 +137,16 @@ class ZutDataUpdater{
 
         $formattedJson = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         return $formattedJson;
+    }
+
+    private function processJsonData(string $jsonContent): array
+    {
+        $data = json_decode($jsonContent, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \RuntimeException("Invalid JSON content.");
+        }
+
+        return $data;
     }
 }

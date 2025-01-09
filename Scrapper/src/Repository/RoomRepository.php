@@ -16,28 +16,61 @@ class RoomRepository extends ServiceEntityRepository
         parent::__construct($registry, Room::class);
     }
 
-    //    /**
-    //     * @return Room[] Returns an array of Room objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('r.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * @return Room[] Returns an array of Room objects
+     */
+    public function findAllRooms(): array
+    {
+        return $this->createQueryBuilder('r')
+            ->getQuery()
+            ->getResult();
+    }
 
-    //    public function findOneBySomeField($value): ?Room
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    /**
+     * @return Room|null Returns a Room object or null
+     */
+    public function findRoomById(int $id): ?Room
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * @return Room|null Returns a Room object or null
+     */
+    public function findRoomByName(string $name): ?Room
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.name = :name')
+            ->setParameter('name', $name)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * Saves a Room entity
+     */
+    public function saveRoom(Room $room): void
+    {
+        $_em = $this->getEntityManager();
+
+        $_em->persist($room);
+        $_em->flush();
+    }
+
+    /**
+     * Saves a list of Room entities
+     */
+    public function saveRooms(array $rooms): void
+    {
+        $_em = $this->getEntityManager();
+
+        foreach ($rooms as $room) {
+            $_em->persist($room);
+        }
+        $_em->flush();
+    }
 }
