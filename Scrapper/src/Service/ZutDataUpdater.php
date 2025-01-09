@@ -22,7 +22,7 @@ class ZutDataUpdater{
 
     public function updateZutData(): void{
         $this->updateSpecificZutData(ZutDataKinds::Teachers);
-        $this->updateSpecificZutData(ZutDataKinds::Groups);
+//        $this->updateSpecificZutData(ZutDataKinds::Groups);
         $this->updateSpecificZutData(ZutDataKinds::Subjects);
         $this->updateSpecificZutData(ZutDataKinds::Rooms);
     }
