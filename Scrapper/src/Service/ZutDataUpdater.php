@@ -3,11 +3,14 @@
 namespace App\Service;
 
 use App\Config\ConfigReader;
+use App\Entity\DataUpdateLog;
 use App\Entity\Room;
 use App\Entity\Subject;
 use App\Entity\Teacher;
+use App\Enum\DataUpdateTypes;
 use App\Enum\ZutDataKinds;
 use App\Enum\ZutScheduleDataKinds;
+use App\Utils\DateHelper;
 use DateTime;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -19,9 +22,10 @@ class ZutDataUpdater{
     private RoomService $roomService;
     private TeacherService $teacherService;
     private SubjectService $subjectService;
+    private DataUpdateLogService $dataUpdateLogService;
 
     public function __construct(HttpClientInterface $client, RoomService $roomService, TeacherService $teacherService,
-                                SubjectService $subjectService)
+                                SubjectService $subjectService, DataUpdateLogService $dataUpdateLogService)
     {
         $url = (new ConfigReader())->getApiBaseUrl();
         $this->client = $client;
@@ -29,6 +33,7 @@ class ZutDataUpdater{
         $this->roomService = $roomService;
         $this->teacherService = $teacherService;
         $this->subjectService = $subjectService;
+        $this->dataUpdateLogService = $dataUpdateLogService;
     }
 
     public function updateOutput(OutputInterface $output): void
@@ -37,11 +42,47 @@ class ZutDataUpdater{
     }
 
     public function updateZutData(): void{
+        $lastMontlyDataUpdate = $this->dataUpdateLogService->findLastByType(DataUpdateTypes::Monthly);
+        if ($lastMontlyDataUpdate === null) {
+            $lastMontlyDataUpdate = new DataUpdateLog();
+            $lastMontlyDataUpdate->setType(DataUpdateTypes::Monthly);
+            $lastMontlyDataUpdate->setUpdateDate(DateHelper::getCurrentDay());
+            $this->dataUpdateLogService->save($lastMontlyDataUpdate);
+        }
 
-        $this->updateSpecificZutData(ZutDataKinds::Teachers);
-//        $this->updateSpecificZutData(ZutDataKinds::Groups);
-        $this->updateSpecificZutData(ZutDataKinds::Subjects);
-        $this->updateSpecificZutData(ZutDataKinds::Rooms);
+        if ($lastMontlyDataUpdate !== null) {
+            $lastUpdateDate = $lastMontlyDataUpdate->getUpdateDate();
+            $currentDate = DateHelper::getCurrentDay();
+            $diff = $currentDate->diff($lastUpdateDate);
+            if ($diff->days < 30) {
+                $this->output->writeln('<info>There is no need to update monthly data.</info>');
+            } else {
+                $this->output->writeln('<info>Updating monthly data...</info>');
+                $this->updateSpecificZutData(ZutDataKinds::Teachers);
+//          $this->updateSpecificZutData(ZutDataKinds::Groups);
+                $this->updateSpecificZutData(ZutDataKinds::Subjects);
+                $this->updateSpecificZutData(ZutDataKinds::Rooms);
+            }
+        }
+
+        $lastWeeklyDataUpdate = $this->dataUpdateLogService->findLastByType(DataUpdateTypes::Weekly);
+        if ($lastWeeklyDataUpdate === null) {
+            $lastWeeklyDataUpdate = new DataUpdateLog();
+            $lastWeeklyDataUpdate->setType(DataUpdateTypes::Weekly);
+            $lastWeeklyDataUpdate->setUpdateDate(DateHelper::getCurrentWeek()['start']);
+            $this->dataUpdateLogService->save($lastWeeklyDataUpdate);
+        }
+        if ($lastWeeklyDataUpdate !== null) {
+            $lastUpdateDate = $lastWeeklyDataUpdate->getUpdateDate();
+            $currentDate = DateHelper::getCurrentWeek()['start'];
+            $diff = $currentDate->diff($lastUpdateDate);
+            if ($diff->days < 7) {
+                $this->output->writeln('<info>There is no need to update weekly data.</info>');
+            } else {
+                $this->output->writeln('<info>Updating weekly data...</info>');
+                $this->updateTeachersScheduleData();
+            }
+        }
     }
 
     public function updateTeachersScheduleData(): void{
