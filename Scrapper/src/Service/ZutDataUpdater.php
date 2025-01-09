@@ -21,7 +21,7 @@ class ZutDataUpdater{
     private SubjectService $subjectService;
 
     public function __construct(HttpClientInterface $client, RoomService $roomService, TeacherService $teacherService,
-                                SubjectService      $subjectService)
+                                SubjectService $subjectService)
     {
         $url = (new ConfigReader())->getApiBaseUrl();
         $this->client = $client;
@@ -37,6 +37,7 @@ class ZutDataUpdater{
     }
 
     public function updateZutData(): void{
+
         $this->updateSpecificZutData(ZutDataKinds::Teachers);
 //        $this->updateSpecificZutData(ZutDataKinds::Groups);
         $this->updateSpecificZutData(ZutDataKinds::Subjects);

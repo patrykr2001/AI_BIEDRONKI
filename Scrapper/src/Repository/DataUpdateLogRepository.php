@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\DataUpdateLog;
+use App\Enum\DataUpdateTypes;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,28 +17,30 @@ class DataUpdateLogRepository extends ServiceEntityRepository
         parent::__construct($registry, DataUpdateLog::class);
     }
 
-    //    /**
-    //     * @return DataUpdateLog[] Returns an array of DataUpdateLog objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('d')
-    //            ->andWhere('d.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('d.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * @return DataUpdateLog|null Returns the last DataUpdateLog record for the given type or null
+     */
+    public function findLastByType(DataUpdateTypes $type): ?DataUpdateLog
+    {
+        return $this->createQueryBuilder('d')
+            ->andWhere('d.type = :type')
+            ->setParameter('type', $type)
+            ->orderBy('d.updatedAt', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 
-    //    public function findOneBySomeField($value): ?DataUpdateLog
-    //    {
-    //        return $this->createQueryBuilder('d')
-    //            ->andWhere('d.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    /**
+     * Saves a new DataUpdateLog record.
+     *
+     * @param DataUpdateLog $dataUpdateLog
+     */
+    public function save(DataUpdateLog $dataUpdateLog): void
+    {
+        $_em = $this->getEntityManager();
+
+        $_em->persist($dataUpdateLog);
+        $_em->flush();
+    }
 }
