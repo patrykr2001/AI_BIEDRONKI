@@ -41,14 +41,10 @@ class SubjectService
 
     public function saveNewSubjects(array $subjects): void
     {
-        $newSubjects = [];
         foreach ($subjects as $subject) {
             if ($this->subjectRepository->findSubjectByName($subject->getName()) === null) {
-                $newSubjects[] = $subject;
+                $this->subjectRepository->saveSubject($subject);
             }
-        }
-        if (!empty($newSubjects)) {
-            $this->subjectRepository->saveSubjects($newSubjects);
         }
     }
 }

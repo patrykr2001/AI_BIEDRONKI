@@ -41,14 +41,10 @@ class RoomService
 
     public function saveNewRooms(array $rooms): void
     {
-        $newRooms = [];
         foreach ($rooms as $room) {
             if ($this->roomRepository->findRoomByName($room->getName()) === null) {
-                $newRooms[] = $room;
+                $this->roomRepository->saveRoom($room);
             }
-        }
-        if (!empty($newRooms)) {
-            $this->roomRepository->saveRooms($newRooms);
         }
     }
 }

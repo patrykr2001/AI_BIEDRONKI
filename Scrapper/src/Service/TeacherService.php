@@ -44,11 +44,8 @@ class TeacherService
         $newTeachers = [];
         foreach ($teachers as $teacher) {
             if ($this->teacherRepository->findTeacherByName($teacher->getName()) === null) {
-                $newTeachers[] = $teacher;
+                $this->teacherRepository->saveTeacher($teacher);
             }
-        }
-        if (!empty($newTeachers)) {
-            $this->teacherRepository->saveTeachers($newTeachers);
         }
     }
 }
