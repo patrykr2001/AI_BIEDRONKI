@@ -16,6 +16,11 @@ class SubjectRepository extends ServiceEntityRepository
         parent::__construct($registry, Subject::class);
     }
 
+    public function clearCache(): void{
+        $_em = $this->getEntityManager();
+        $_em->clear();
+    }
+
     /**
      * @return Subject[] Returns an array of Subject objects
      */

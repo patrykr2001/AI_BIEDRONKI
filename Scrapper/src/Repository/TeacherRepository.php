@@ -16,6 +16,11 @@ class TeacherRepository extends ServiceEntityRepository
         parent::__construct($registry, Teacher::class);
     }
 
+    public function clearCache(): void{
+        $_em = $this->getEntityManager();
+        $_em->clear();
+    }
+
     /**
      * @return Teacher[] Returns an array of Teacher objects
      */

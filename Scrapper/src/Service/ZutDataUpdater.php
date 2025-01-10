@@ -172,6 +172,7 @@ class ZutDataUpdater{
         $this->output->writeln('<info>Processing ' . $kind->name . ' data...</info>');
 
         $processedData = $this->processJsonData($data);
+        $data = null;
 
         $this->output->writeln('<info>Saving ' . $kind->name . ' data...</info>');
 
@@ -205,7 +206,10 @@ class ZutDataUpdater{
                 break;
         }
 
+        $objects = null;
+
         $this->output->writeln('<info>Data successfully fetched and saved '.$kind->name.' data.</info>');
+        gc_collect_cycles();
     }
 
     function getSubstringBeforeParenthesis(string $input): string
@@ -322,8 +326,13 @@ class ZutDataUpdater{
             }
             $this->lessonService->saveNewLessons($objects);
 
+            $data = null;
+            $processedData = null;
+            $objects = null;
+
             $this->output->writeln('<info>Data successfully fetched and saved ' . $teacherString . ' schedule data.</info>');
             $this->output->writeln('<info>Number of lessons: ' . $dataCount . '</info>');
+            gc_collect_cycles();
         }
     }
 
@@ -402,12 +411,12 @@ class ZutDataUpdater{
 
     function removeFirstEmptyArrayComma(string $input): string
     {
-        return preg_replace('/\[\],/', '', $input, 1);
+        return preg_replace('/\[],/', '', $input, 1);
     }
 
     function removeFirstEmptyArray(string $input): string
     {
-        return preg_replace('/\[\]/', '', $input, 1);
+        return preg_replace('/\[]/', '', $input, 1);
     }
 
     function capitalizeFirstLetterOfEachWord(string $input): string

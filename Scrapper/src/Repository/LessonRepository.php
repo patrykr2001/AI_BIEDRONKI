@@ -20,6 +20,11 @@ class LessonRepository extends ServiceEntityRepository
         parent::__construct($registry, Lesson::class);
     }
 
+    public function clearCache(): void{
+        $_em = $this->getEntityManager();
+        $_em->clear();
+    }
+
     /**
      * Saves a Lesson entity.
      *

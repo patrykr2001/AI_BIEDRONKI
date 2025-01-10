@@ -16,6 +16,11 @@ class RoomRepository extends ServiceEntityRepository
         parent::__construct($registry, Room::class);
     }
 
+    public function clearCache(): void{
+        $_em = $this->getEntityManager();
+        $_em->clear();
+    }
+
     /**
      * @return Room[] Returns an array of Room objects
      */

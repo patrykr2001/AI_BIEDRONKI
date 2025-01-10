@@ -50,5 +50,6 @@ class SubjectService
             }
             ProgressBarPrinter::printProgressBar(++$done, $total, step: 50);
         }
+        $this->subjectRepository->clearCache();
     }
 }

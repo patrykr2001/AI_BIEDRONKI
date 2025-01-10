@@ -50,5 +50,6 @@ class RoomService
             }
             ProgressBarPrinter::printProgressBar(++$done, $total, step: 10);
         }
+        $this->roomRepository->clearCache();
     }
 }

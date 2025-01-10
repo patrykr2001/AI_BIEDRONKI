@@ -50,5 +50,6 @@ class TeacherService
             }
             ProgressBarPrinter::printProgressBar(++$done, $total, step: 10);
         }
+        $this->teacherRepository->clearCache();
     }
 }
