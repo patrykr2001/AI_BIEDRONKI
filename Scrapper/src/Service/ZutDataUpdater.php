@@ -102,7 +102,8 @@ class ZutDataUpdater{
         }
     }
 
-    public function updateTeachersScheduleData(): void{
+    private function updateTeachersScheduleData(): void
+    {
         $teachers = array_map(fn($teacher) => $teacher->getName(), $this->teacherService->getAllTeachers());
         $dates = (new ConfigReader())->getDateRange();
         $this->updateSpecificTeachersScheduleData($teachers, new DateTime($dates['start']), new DateTime($dates['end']));

@@ -24,8 +24,7 @@ class ScrapZutApiCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->zutDataUpdater->updateOutput($output);
-//        $this->zutDataUpdater->updateZutData();
-        $this->zutDataUpdater->updateTeachersScheduleData();
+        $this->zutDataUpdater->updateZutData();
 
         return Command::SUCCESS;
     }
