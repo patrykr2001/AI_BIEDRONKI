@@ -32,11 +32,42 @@ class DateHelper
         return new DateTime();
     }
 
+    public static function getTodayStart(): DateTime
+    {
+        return (new DateTime())->setTime(0, 0);
+    }
+
+    public static function getTodayEnd(): DateTime
+    {
+        return (new DateTime())->setTime(23, 59);
+    }
+
     public static function getCurrentMonth(): array
     {
         $startOfMonth = new DateTime('first day of this month');
         $endOfMonth = new DateTime('last day of this month');
 
         return [$startOfMonth, $endOfMonth];
+    }
+
+    public static function getDate31DaysAgo(): DateTime
+    {
+        $date = new DateTime();
+        $date->sub(new DateInterval('P31D'));
+        return $date;
+    }
+
+    public static function getDate8DaysAgo(): DateTime
+    {
+        $date = new DateTime();
+        $date->sub(new DateInterval('P8D'));
+        return $date;
+    }
+
+    public static function getDateYesterday(): DateTime
+    {
+        $date = new DateTime();
+        $date->sub(new DateInterval('P1D'));
+        return $date;
     }
 }

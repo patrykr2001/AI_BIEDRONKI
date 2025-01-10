@@ -51,12 +51,18 @@ class ZutDataUpdater{
     }
 
     public function updateZutData(): void{
+        $this->updateMonthlyData();
+        $this->updateWeeklyData();
+        $this->updateDailyData();
+    }
+
+    private function updateMonthlyData(): void
+    {
         $lastMontlyDataUpdate = $this->dataUpdateLogService->findLastByType(DataUpdateTypes::Monthly);
         if ($lastMontlyDataUpdate === null) {
             $lastMontlyDataUpdate = new DataUpdateLog();
             $lastMontlyDataUpdate->setType(DataUpdateTypes::Monthly);
-            $lastMontlyDataUpdate->setUpdateDate(DateHelper::getCurrentDay());
-            $this->dataUpdateLogService->save($lastMontlyDataUpdate);
+            $lastMontlyDataUpdate->setUpdateDate(DateHelper::getDate31DaysAgo());
         }
 
         if ($lastMontlyDataUpdate !== null) {
@@ -77,23 +83,25 @@ class ZutDataUpdater{
             $lastMontlyDataUpdate->setUpdateDate(DateHelper::getCurrentDay());
             $this->dataUpdateLogService->save($lastMontlyDataUpdate);
         }
+    }
 
+    private function updateWeeklyData(): void
+    {
         $lastWeeklyDataUpdate = $this->dataUpdateLogService->findLastByType(DataUpdateTypes::Weekly);
         if ($lastWeeklyDataUpdate === null) {
             $lastWeeklyDataUpdate = new DataUpdateLog();
             $lastWeeklyDataUpdate->setType(DataUpdateTypes::Weekly);
-            $lastWeeklyDataUpdate->setUpdateDate(DateHelper::getCurrentWeek()[0]);
-            $this->dataUpdateLogService->save($lastWeeklyDataUpdate);
+            $lastWeeklyDataUpdate->setUpdateDate(DateHelper::getDate8DaysAgo());
         }
         if ($lastWeeklyDataUpdate !== null) {
             $lastUpdateDate = $lastWeeklyDataUpdate->getUpdateDate();
-            $currentDate = DateHelper::getCurrentWeek()[0];
-            $diff = $currentDate->diff($lastUpdateDate);
+            $currentDate = DateHelper::getCurrentWeek();
+            $diff = $currentDate->diff($lastUpdateDate[0]);
             if ($diff->days < 7) {
                 $this->output->writeln('<info>There is no need to update weekly data.</info>');
             } else {
                 $this->output->writeln('<info>Updating weekly data...</info>');
-                $this->updateTeachersScheduleData();
+                $this->updateTeachersScheduleData($currentDate[0], $currentDate[1]);
             }
             $lastWeeklyDataUpdate = new DataUpdateLog();
             $lastWeeklyDataUpdate->setType(DataUpdateTypes::Weekly);
@@ -102,11 +110,35 @@ class ZutDataUpdater{
         }
     }
 
-    private function updateTeachersScheduleData(): void
+    private function updateDailyData(): void
+    {
+        $lastDailyDataUpdate = $this->dataUpdateLogService->findLastByType(DataUpdateTypes::Daily);
+        if ($lastDailyDataUpdate === null) {
+            $lastDailyDataUpdate = new DataUpdateLog();
+            $lastDailyDataUpdate->setType(DataUpdateTypes::Daily);
+            $lastDailyDataUpdate->setUpdateDate(DateHelper::getDateYesterday());
+        }
+        if ($lastDailyDataUpdate !== null) {
+            $lastUpdateDate = $lastDailyDataUpdate->getUpdateDate();
+            $currentDate = DateHelper::getTodayStart();
+            $diff = $currentDate->diff($lastUpdateDate);
+            if ($diff->days < 2) {
+                $this->output->writeln('<info>There is no need to update daily data.</info>');
+            } else {
+                $this->output->writeln('<info>Updating daily data...</info>');
+                $this->updateTeachersScheduleData(DateHelper::getTodayStart(), DateHelper::getTodayEnd());
+            }
+            $lastDailyDataUpdate = new DataUpdateLog();
+            $lastDailyDataUpdate->setType(DataUpdateTypes::Daily);
+            $lastDailyDataUpdate->setUpdateDate(DateHelper::getCurrentDay());
+            $this->dataUpdateLogService->save($lastDailyDataUpdate);
+        }
+    }
+
+    private function updateTeachersScheduleData(DateTime $start, Datetime $end): void
     {
         $teachers = array_map(fn($teacher) => $teacher->getName(), $this->teacherService->getAllTeachers());
-        $dates = (new ConfigReader())->getDateRange();
-        $this->updateSpecificTeachersScheduleData($teachers, new DateTime($dates['start']), new DateTime($dates['end']));
+        $this->updateSpecificTeachersScheduleData($teachers, $start, $end);
     }
 
     private function updateSpecificZutData(ZutDataKinds $kind): void
