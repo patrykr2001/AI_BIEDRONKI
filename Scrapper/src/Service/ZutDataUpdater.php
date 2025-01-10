@@ -350,6 +350,8 @@ class ZutDataUpdater{
                 return LessonForms::Field;
             case 'seminarium dyplomowe':
                 return LessonForms::DiplomaSeminar;
+            case 'lektorat':
+                return LessonForms::LanguageCourse;
             default:
                 $this->output->writeln('<error>Unknown lesson form: ' . $lessonForm . '</error>');
                 return LessonForms::Lecture;

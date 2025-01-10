@@ -14,4 +14,5 @@ enum LessonForms: string
     case Auditory = 'audytoryjne';
     case Field = 'terenowe';
     case DiplomaSeminar = 'seminarium dyplomowe';
+    case LanguageCourse = 'lektorat';
 }
