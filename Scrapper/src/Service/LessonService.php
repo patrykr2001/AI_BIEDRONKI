@@ -43,11 +43,12 @@ class LessonService
      */
     public function saveNewLessons(array $lessons): void
     {
-        foreach ($lessons as $lesson) {
-            if ($this->lessonRepository->findLessonByName($lesson->getName()) === null) {
+        foreach ($lessons as $lesson)
+//            var_dump($lesson);
+            if ($this->lessonRepository->findLessonByTeacherStartEnd($lesson->getWorkerId(), $lesson->getStartDate(),
+                    $lesson->getEndDate()) === null) {
                 $this->lessonRepository->save($lesson);
             }
-        }
     }
 
     /**

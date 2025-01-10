@@ -23,7 +23,7 @@ class Lesson
     private ?\DateTimeInterface $endDate = null;
 
     #[ORM\Column]
-    private ?int $hours = null;
+    private ?float $hours = null;
 
     #[ORM\ManyToOne]
     private ?Teacher $workerId = null;
@@ -32,18 +32,18 @@ class Lesson
     private ?Teacher $workerCoverId = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Group $groupId = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Room $roomId = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Subject $subjectId = null;
 
-    #[ORM\Column(enumType: LessonForms::class)]
+    #[ORM\Column(nullable: true, enumType: LessonForms::class)]
     private ?LessonForms $lessonForm = null;
 
     #[ORM\Column(enumType: LessonStatuses::class)]

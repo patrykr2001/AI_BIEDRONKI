@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Config\ConfigReader;
 use App\Entity\DataUpdateLog;
+use App\Entity\Group;
 use App\Entity\Lesson;
 use App\Entity\Room;
 use App\Entity\Subject;
@@ -27,10 +28,11 @@ class ZutDataUpdater{
     private SubjectService $subjectService;
     private DataUpdateLogService $dataUpdateLogService;
     private LessonService $lessonService;
+    private GroupService $groupService;
 
     public function __construct(HttpClientInterface $client, RoomService $roomService, TeacherService $teacherService,
                                 SubjectService $subjectService, DataUpdateLogService $dataUpdateLogService,
-                                LessonService  $lessonService)
+                                LessonService $lessonService, GroupService $groupService)
     {
         $url = (new ConfigReader())->getApiBaseUrl();
         $this->client = $client;
@@ -40,6 +42,7 @@ class ZutDataUpdater{
         $this->subjectService = $subjectService;
         $this->dataUpdateLogService = $dataUpdateLogService;
         $this->lessonService = $lessonService;
+        $this->groupService = $groupService;
     }
 
     public function updateOutput(OutputInterface $output): void
@@ -175,6 +178,8 @@ class ZutDataUpdater{
 
     private function updateSpecificTeachersScheduleData(array $teachers, DateTime $start, DateTime $end): void
     {
+        $dataCount = 0;
+
         foreach ($teachers as $teacherString) {
             $data = [ZutScheduleDataKinds::Teachers->value => $teacherString];
 
@@ -199,43 +204,75 @@ class ZutDataUpdater{
             $this->output->writeln('<info>Processing ' . $teacherString . ' schedule data...</info>');
 
             $processedData = $this->processJsonData($data);
-
-            $this->output->writeln('<info>Saving ' . $teacherString . ' schedule data...</info>');
+            if (count($processedData) === 0) {
+                $this->output->writeln('<info>No data to process for ' . $teacherString . ' schedule data.</info>');
+                continue;
+            }
 
             $objects = [];
 
+            $this->output->writeln('<info>Saving ' . $teacherString . ' schedule data in number of ' . count($processedData) . '...</info>');
+            $dataCount += count($processedData);
+
             foreach ($processedData as $item) {
-                $room = $this->roomService->getRoomByName($item['room']);
-                $subject = $this->subjectService->getSubjectByName($item['subject']);
+//                $this->output->writeln(json_encode($item, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+                $subject = $this->subjectService->getSubjectByName($this->capitalizeFirstLetterOfEachWord($item['subject']));
                 $teacher = $this->teacherService->getTeacherByName($item['worker']);
-                $lessonForm = $this->mapLessonForm($item['lesson_form']);
                 $lessonStatus = $this->mapLessonStatus($item['status_item']);
                 $hours = $item['hours'];
-                $startDate = new DateTime($item['start_date']);
-                $endDate = new DateTime($item['end_date']);
+                $startDate = new DateTime($item['start']);
+                $endDate = new DateTime($item['end']);
 
                 $teacherCover = null;
                 if ($item['worker_cover'] !== null && $item['worker_cover'] !== '') {
                     $teacherCover = $this->teacherService->getTeacherByName($item['worker_cover']);
+                }
+                $room = null;
+                if ($item['room'] !== null && $item['room'] !== '') {
+                    $room = $this->roomService->getRoomByName($item['room']);
+                }
+                $lessonForm = null;
+                if ($item['lesson_form'] !== null && $item['lesson_form'] !== '') {
+                    $lessonForm = $this->mapLessonForm($item['lesson_form']);
+                }
+
+                $group = null;
+                if ($item['group_name'] !== null) {
+                    $groupName = $item['group_name'];
+                    if ($this->groupService->getGroupByName($groupName) !== null) {
+                        $group = $this->groupService->getGroupByName($groupName);
+                    } else {
+                        $group = new Group();
+                        $group->setName($groupName);
+                        $this->groupService->save($group);
+                    }
                 }
 
                 $lesson = new Lesson();
                 $lesson->setStartDate($startDate);
                 $lesson->setEndDate($endDate);
                 $lesson->setHours($hours);
-                $lesson->setRoomId($room->getId());
-                $lesson->setSubjectId($subject->getId());
-                $lesson->setWorkerId($teacher->getId());
-                $lesson->setLessonForm($lessonForm);
+                $lesson->setSubjectId($subject);
+                $lesson->setWorkerId($teacher);
                 $lesson->setLessonStatus($lessonStatus);
                 if ($teacherCover !== null) {
-                    $lesson->setWorkerCoverId($teacherCover->getId());
+                    $lesson->setWorkerCoverId($teacherCover);
+                }
+                if ($room !== null) {
+                    $lesson->setRoomId($room);
+                }
+                if ($lessonForm !== null) {
+                    $lesson->setLessonForm($lessonForm);
+                }
+                if ($group !== null) {
+                    $lesson->setGroupId($group);
                 }
                 $objects[] = $lesson;
             }
             $this->lessonService->saveNewLessons($objects);
 
             $this->output->writeln('<info>Data successfully fetched and saved ' . $teacherString . ' schedule data.</info>');
+            $this->output->writeln('<info>Number of lessons: ' . $dataCount . '</info>');
         }
     }
 
@@ -274,6 +311,8 @@ class ZutDataUpdater{
 
     private function processJsonData(string $jsonContent): array
     {
+        $jsonContent = $this->removeFirstEmptyArrayComma($jsonContent);
+        $jsonContent = $this->removeFirstEmptyArray($jsonContent);
         $data = json_decode($jsonContent, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
@@ -281,5 +320,20 @@ class ZutDataUpdater{
         }
 
         return $data;
+    }
+
+    function removeFirstEmptyArrayComma(string $input): string
+    {
+        return preg_replace('/\[\],/', '', $input, 1);
+    }
+
+    function removeFirstEmptyArray(string $input): string
+    {
+        return preg_replace('/\[\]/', '', $input, 1);
+    }
+
+    function capitalizeFirstLetterOfEachWord(string $input): string
+    {
+        return ucwords($input);
     }
 }

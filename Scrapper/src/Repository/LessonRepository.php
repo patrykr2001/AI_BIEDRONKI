@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Lesson;
+use App\Entity\Teacher;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -23,8 +25,10 @@ class LessonRepository extends ServiceEntityRepository
      */
     public function save(Lesson $lesson): void
     {
-        $this->_em->persist($lesson);
-        $this->_em->flush();
+        $_em = $this->getEntityManager();
+
+        $_em->persist($lesson);
+        $_em->flush();
     }
 
     /**
@@ -33,9 +37,17 @@ class LessonRepository extends ServiceEntityRepository
      * @param string $name
      * @return Lesson|null
      */
-    public function findLessonByName(string $name): ?Lesson
+    public function findLessonByTeacherStartEnd(Teacher $teacher, DateTime $start, DateTime $end): ?Lesson
     {
-        return $this->findOneBy(['name' => $name]);
+        return $this->createQueryBuilder('l')
+            ->andWhere('l.workerId = :teacher')
+            ->andWhere('l.startDate >= :start')
+            ->andWhere('l.endDate <= :end')
+            ->setParameter('teacher', $teacher)
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     /**
