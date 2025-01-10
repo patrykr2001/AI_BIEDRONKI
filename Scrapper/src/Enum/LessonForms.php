@@ -13,4 +13,5 @@ enum LessonForms: string
     case RemotePass = 'zaliczenie zdalne';
     case Auditory = 'audytoryjne';
     case Field = 'terenowe';
+    case DiplomaSeminar = 'seminarium dyplomowe';
 }
