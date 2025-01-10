@@ -53,7 +53,7 @@ class SubjectRepository extends ServiceEntityRepository
     /**
      * Saves a Subject entity
      */
-    public function saveSubject(Subject $subject): void
+    public function save(Subject $subject): void
     {
         $_em = $this->getEntityManager();
 

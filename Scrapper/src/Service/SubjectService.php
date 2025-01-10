@@ -29,9 +29,9 @@ class SubjectService
         return $this->subjectRepository->findSubjectByName($name);
     }
 
-    public function saveSubject(Subject $subject): void
+    public function save(Subject $subject): void
     {
-        $this->subjectRepository->saveSubject($subject);
+        $this->subjectRepository->save($subject);
     }
 
     public function saveSubjects(array $subjects): void

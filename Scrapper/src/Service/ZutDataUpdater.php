@@ -137,6 +137,8 @@ class ZutDataUpdater{
 
     private function updateTeachersScheduleData(DateTime $start, Datetime $end): void
     {
+        $teachers = [];
+//        $teachers[] = 'Abramek Karol';
         $teachers = array_map(fn($teacher) => $teacher->getName(), $this->teacherService->getAllTeachers());
         $this->updateSpecificTeachersScheduleData($teachers, $start, $end);
     }
@@ -249,7 +251,6 @@ class ZutDataUpdater{
 
             foreach ($processedData as $item) {
 //                $this->output->writeln(json_encode($item, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-                $subject = $this->subjectService->getSubjectByName($this->capitalizeFirstLetterOfEachWord($item['subject']));
                 $teacher = $this->teacherService->getTeacherByName($item['worker']);
                 $lessonStatus = $this->mapLessonStatus($item['status_item']);
                 $hours = $item['hours'];
@@ -278,6 +279,17 @@ class ZutDataUpdater{
                         $group = new Group();
                         $group->setName($groupName);
                         $this->groupService->save($group);
+                    }
+                }
+                $subject = null;
+                if ($item['subject'] !== null) {
+                    $subjectName = $this->capitalizeFirstLetterOfEachWord($item['subject']);
+                    if ($this->subjectService->getSubjectByName($subjectName) !== null) {
+                        $subject = $this->subjectService->getSubjectByName($subjectName);
+                    } else {
+                        $subject = new Subject();
+                        $subject->setName($subjectName);
+                        $this->subjectService->save($subject);
                     }
                 }
 
@@ -326,6 +338,8 @@ class ZutDataUpdater{
     {
         return match ($lessonStatus) {
             'odwołane' => LessonStatuses::Cancelled,
+            'konsultacje' => LessonStatuses::Consultation,
+            'wyjątek' => LessonStatuses::Exception,
             default => LessonStatuses::Normal,
         };
     }
