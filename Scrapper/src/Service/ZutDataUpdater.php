@@ -361,6 +361,8 @@ class ZutDataUpdater{
                 return LessonForms::DiplomaSeminar;
             case 'lektorat':
                 return LessonForms::LanguageCourse;
+            case 'konwersatorium':
+                return LessonForms::Conservatory;
             default:
                 $this->output->writeln('<error>Unknown lesson form: ' . $lessonForm . '</error>');
                 return LessonForms::Lecture;
@@ -392,8 +394,7 @@ class ZutDataUpdater{
             throw new \RuntimeException("Invalid JSON content.");
         }
 
-        $formattedJson = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-        return $formattedJson;
+        return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 
     private function processJsonData(string $jsonContent): array

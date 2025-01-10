@@ -15,4 +15,5 @@ enum LessonForms: string
     case Field = 'terenowe';
     case DiplomaSeminar = 'seminarium dyplomowe';
     case LanguageCourse = 'lektorat';
+    case Conservatory = 'konserwatorium';
 }
