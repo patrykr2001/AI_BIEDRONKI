@@ -48,7 +48,7 @@ class SubjectService
             if ($this->subjectRepository->findSubjectByName($subject->getName()) === null) {
                 $this->subjectRepository->saveSubject($subject);
             }
-            ProgressBarPrinter::printProgressBar(++$done, $total);
+            ProgressBarPrinter::printProgressBar(++$done, $total, step: 50);
         }
     }
 }

@@ -48,7 +48,7 @@ class TeacherService
             if ($this->teacherRepository->findTeacherByName($teacher->getName()) === null) {
                 $this->teacherRepository->saveTeacher($teacher);
             }
-            ProgressBarPrinter::printProgressBar(++$done, $total);
+            ProgressBarPrinter::printProgressBar(++$done, $total, step: 10);
         }
     }
 }

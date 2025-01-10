@@ -4,9 +4,13 @@ namespace App\Utils;
 
 class ProgressBarPrinter
 {
-    public static function printProgressBar($done, $total, $size = 30): void
+    public static function printProgressBar($done, $total, $size = 30, $step = 1): void
     {
         if ($done > $total) {
+            return;
+        }
+
+        if ($done % $step !== 0) {
             return;
         }
 

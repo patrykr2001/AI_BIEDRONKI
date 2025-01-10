@@ -77,6 +77,10 @@ class ZutDataUpdater{
 //                  $this->updateSpecificZutData(ZutDataKinds::Groups);
                 $this->updateSpecificZutData(ZutDataKinds::Subjects);
                 $this->updateSpecificZutData(ZutDataKinds::Rooms);
+                $config = new ConfigReader();
+                $startDate = new DateTime($config->getDateRange()['start']);
+                $endDate = new DateTime($config->getDateRange()['end']);
+                $this->updateTeachersScheduleData($startDate, $endDate);
                 $lastMontlyDataUpdate = new DataUpdateLog();
                 $lastMontlyDataUpdate->setType(DataUpdateTypes::Monthly);
                 $lastMontlyDataUpdate->setUpdateDate(DateHelper::getCurrentDay());
@@ -101,6 +105,8 @@ class ZutDataUpdater{
                 $this->output->writeln('<info>There is no need to update weekly data. Last update ' . $lastWeeklyDataUpdate->getUpdateDate()->format('y-m-d') . '. Days from last update ' . $diff->days . '</info>');
             } else {
                 $this->output->writeln('<info>Updating weekly data...</info>');
+                $this->updateTeachersScheduleData($currentDate[0], $currentDate[1]);
+                $currentDate = DateHelper::getNextWeek();
                 $this->updateTeachersScheduleData($currentDate[0], $currentDate[1]);
                 $lastWeeklyDataUpdate = new DataUpdateLog();
                 $lastWeeklyDataUpdate->setType(DataUpdateTypes::Weekly);
@@ -323,25 +329,38 @@ class ZutDataUpdater{
 
     private function mapLessonForm(string $lessonForm): LessonForms
     {
-        return match ($lessonForm) {
-            'laboratorium' => LessonForms::Laboratory,
-            'seminarium' => LessonForms::Seminar,
-            'projekt' => LessonForms::Project,
-            'zaliczenie' => LessonForms::Pass,
-            'zaliczenie zdalne' => LessonForms::RemotePass,
-            'zajęcia zdalne' => LessonForms::Remote,
-            default => LessonForms::Lecture,
-        };
+        switch ($lessonForm) {
+            case 'laboratorium':
+                return LessonForms::Laboratory;
+            case 'seminarium':
+                return LessonForms::Seminar;
+            case 'projekt':
+                return LessonForms::Project;
+            case 'zaliczenie':
+                return LessonForms::Pass;
+            case 'zaliczenie zdalne':
+                return LessonForms::RemotePass;
+            case 'zajęcia zdalne':
+                return LessonForms::Remote;
+            default:
+                $this->output->writeln('<error>Unknown lesson form: ' . $lessonForm . '</error>');
+                return LessonForms::Lecture;
+        }
     }
 
     private function mapLessonStatus(string $lessonStatus): LessonStatuses
     {
-        return match ($lessonStatus) {
-            'odwołane' => LessonStatuses::Cancelled,
-            'konsultacje' => LessonStatuses::Consultation,
-            'wyjątek' => LessonStatuses::Exception,
-            default => LessonStatuses::Normal,
-        };
+        switch ($lessonStatus) {
+            case 'odwołane':
+                return LessonStatuses::Cancelled;
+            case 'konsultacje':
+                return LessonStatuses::Consultation;
+            case 'wyjątek':
+                return LessonStatuses::Exception;
+            default:
+                $this->output->writeln('<error>Unknown lesson status: ' . $lessonStatus . '</error>');
+                return LessonStatuses::Normal;
+        }
     }
 
     private function processData(string $jsonContent): string

@@ -48,7 +48,7 @@ class RoomService
             if ($this->roomRepository->findRoomByName($room->getName()) === null) {
                 $this->roomRepository->saveRoom($room);
             }
-            ProgressBarPrinter::printProgressBar(++$done, $total);
+            ProgressBarPrinter::printProgressBar(++$done, $total, step: 10);
         }
     }
 }
