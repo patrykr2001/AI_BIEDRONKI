@@ -59,7 +59,7 @@ class LessonService
             } catch (\Exception $e) {
                 echo $e->getMessage();
             }
-            ProgressBarPrinter::printProgressBar(++$done, $total);
+            ProgressBarPrinter::printProgressBar(++$done, $total, step: 5);
         }
     }
 
