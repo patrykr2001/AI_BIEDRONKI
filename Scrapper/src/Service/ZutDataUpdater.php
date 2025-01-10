@@ -342,6 +342,10 @@ class ZutDataUpdater{
                 return LessonForms::RemotePass;
             case 'zajęcia zdalne':
                 return LessonForms::Remote;
+            case 'wykład':
+                return LessonForms::Lecture;
+            case 'audytoryjne':
+                return LessonForms::Auditory;
             default:
                 $this->output->writeln('<error>Unknown lesson form: ' . $lessonForm . '</error>');
                 return LessonForms::Lecture;
@@ -351,6 +355,8 @@ class ZutDataUpdater{
     private function mapLessonStatus(string $lessonStatus): LessonStatuses
     {
         switch ($lessonStatus) {
+            case 'normalne':
+                return LessonStatuses::Normal;
             case 'odwołane':
                 return LessonStatuses::Cancelled;
             case 'konsultacje':
