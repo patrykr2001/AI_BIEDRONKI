@@ -9,7 +9,7 @@ class DateHelper
 {
     public static function getCurrentWeek(): array
     {
-        $startOfWeek = new DateTime();
+        $startOfWeek = self::getTodayStart();
         $startOfWeek->setISODate((int)$startOfWeek->format('o'), (int)$startOfWeek->format('W'), 1);
         $endOfWeek = clone $startOfWeek;
         $endOfWeek->add(new DateInterval('P6D'));
@@ -19,12 +19,22 @@ class DateHelper
 
     public static function getNextWeek(): array
     {
-        $startOfNextWeek = new DateTime();
+        $startOfNextWeek = self::getTodayStart();
         $startOfNextWeek->setISODate((int)$startOfNextWeek->format('o'), (int)$startOfNextWeek->format('W') + 1, 1);
         $endOfNextWeek = clone $startOfNextWeek;
         $endOfNextWeek->add(new DateInterval('P6D'));
 
         return [$startOfNextWeek, $endOfNextWeek];
+    }
+
+    public static function getPreviousWeek(): array
+    {
+        $startOfPreviousWeek = self::getTodayStart();
+        $startOfPreviousWeek->setISODate((int)$startOfPreviousWeek->format('o'), (int)$startOfPreviousWeek->format('W') - 1, 1);
+        $endOfPreviousWeek = clone $startOfPreviousWeek;
+        $endOfPreviousWeek->add(new DateInterval('P6D'));
+
+        return [$startOfPreviousWeek, $endOfPreviousWeek];
     }
 
     public static function getCurrentDay(): DateTime
@@ -52,21 +62,21 @@ class DateHelper
 
     public static function getDate31DaysAgo(): DateTime
     {
-        $date = new DateTime();
+        $date = self::getTodayStart();
         $date->sub(new DateInterval('P31D'));
         return $date;
     }
 
     public static function getDate8DaysAgo(): DateTime
     {
-        $date = new DateTime();
+        $date = self::getTodayStart();
         $date->sub(new DateInterval('P8D'));
         return $date;
     }
 
     public static function getDateYesterday(): DateTime
     {
-        $date = new DateTime();
+        $date = self::getTodayStart();
         $date->sub(new DateInterval('P1D'));
         return $date;
     }

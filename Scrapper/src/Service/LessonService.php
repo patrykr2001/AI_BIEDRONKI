@@ -45,10 +45,14 @@ class LessonService
     {
         foreach ($lessons as $lesson)
 //            var_dump($lesson);
-            if ($this->lessonRepository->findLessonByTeacherStartEnd($lesson->getWorkerId(), $lesson->getStartDate(),
-                    $lesson->getEndDate()) === null) {
+            $dbLesson = $this->lessonRepository->findLessonByTeacherStartEnd($lesson->getWorkerId(), $lesson->getStartDate(),
+                $lesson->getEndDate());
+        if ($dbLesson === null) {
                 $this->lessonRepository->save($lesson);
-            }
+            } else {
+            $this->lessonRepository->remove($dbLesson);
+            $this->lessonRepository->save($lesson);
+        }
     }
 
     /**

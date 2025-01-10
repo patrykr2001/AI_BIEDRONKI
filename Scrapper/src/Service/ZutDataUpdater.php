@@ -70,18 +70,18 @@ class ZutDataUpdater{
             $currentDate = DateHelper::getCurrentDay();
             $diff = $currentDate->diff($lastUpdateDate);
             if ($diff->days < 30) {
-                $this->output->writeln('<info>There is no need to update monthly data.</info>');
+                $this->output->writeln('<info>There is no need to update monthly data. Last update ' . $lastMontlyDataUpdate->getUpdateDate()->format('y-m-d') . '. Days from last update ' . $diff->days . '</info>');
             } else {
                 $this->output->writeln('<info>Updating monthly data...</info>');
                 $this->updateSpecificZutData(ZutDataKinds::Teachers);
 //                  $this->updateSpecificZutData(ZutDataKinds::Groups);
                 $this->updateSpecificZutData(ZutDataKinds::Subjects);
                 $this->updateSpecificZutData(ZutDataKinds::Rooms);
+                $lastMontlyDataUpdate = new DataUpdateLog();
+                $lastMontlyDataUpdate->setType(DataUpdateTypes::Monthly);
+                $lastMontlyDataUpdate->setUpdateDate(DateHelper::getCurrentDay());
+                $this->dataUpdateLogService->save($lastMontlyDataUpdate);
             }
-            $lastMontlyDataUpdate = new DataUpdateLog();
-            $lastMontlyDataUpdate->setType(DataUpdateTypes::Monthly);
-            $lastMontlyDataUpdate->setUpdateDate(DateHelper::getCurrentDay());
-            $this->dataUpdateLogService->save($lastMontlyDataUpdate);
         }
     }
 
@@ -91,22 +91,22 @@ class ZutDataUpdater{
         if ($lastWeeklyDataUpdate === null) {
             $lastWeeklyDataUpdate = new DataUpdateLog();
             $lastWeeklyDataUpdate->setType(DataUpdateTypes::Weekly);
-            $lastWeeklyDataUpdate->setUpdateDate(DateHelper::getDate8DaysAgo());
+            $lastWeeklyDataUpdate->setUpdateDate(DateHelper::getPreviousWeek()[0]);
         }
         if ($lastWeeklyDataUpdate !== null) {
             $lastUpdateDate = $lastWeeklyDataUpdate->getUpdateDate();
             $currentDate = DateHelper::getCurrentWeek();
-            $diff = $currentDate->diff($lastUpdateDate[0]);
+            $diff = $currentDate[0]->diff($lastUpdateDate);
             if ($diff->days < 7) {
-                $this->output->writeln('<info>There is no need to update weekly data.</info>');
+                $this->output->writeln('<info>There is no need to update weekly data. Last update ' . $lastWeeklyDataUpdate->getUpdateDate()->format('y-m-d') . '. Days from last update ' . $diff->days . '</info>');
             } else {
                 $this->output->writeln('<info>Updating weekly data...</info>');
                 $this->updateTeachersScheduleData($currentDate[0], $currentDate[1]);
+                $lastWeeklyDataUpdate = new DataUpdateLog();
+                $lastWeeklyDataUpdate->setType(DataUpdateTypes::Weekly);
+                $lastWeeklyDataUpdate->setUpdateDate(DateHelper::getCurrentWeek()[0]);
+                $this->dataUpdateLogService->save($lastWeeklyDataUpdate);
             }
-            $lastWeeklyDataUpdate = new DataUpdateLog();
-            $lastWeeklyDataUpdate->setType(DataUpdateTypes::Weekly);
-            $lastWeeklyDataUpdate->setUpdateDate(DateHelper::getCurrentWeek()[0]);
-            $this->dataUpdateLogService->save($lastWeeklyDataUpdate);
         }
     }
 
@@ -122,16 +122,16 @@ class ZutDataUpdater{
             $lastUpdateDate = $lastDailyDataUpdate->getUpdateDate();
             $currentDate = DateHelper::getTodayStart();
             $diff = $currentDate->diff($lastUpdateDate);
-            if ($diff->days < 2) {
-                $this->output->writeln('<info>There is no need to update daily data.</info>');
+            if ($diff->days < 1) {
+                $this->output->writeln('<info>There is no need to update daily data.' . $lastDailyDataUpdate->getUpdateDate()->format('y-m-d') . '. Days from last update ' . $diff->days . '</info>');
             } else {
                 $this->output->writeln('<info>Updating daily data...</info>');
                 $this->updateTeachersScheduleData(DateHelper::getTodayStart(), DateHelper::getTodayEnd());
+                $lastDailyDataUpdate = new DataUpdateLog();
+                $lastDailyDataUpdate->setType(DataUpdateTypes::Daily);
+                $lastDailyDataUpdate->setUpdateDate(DateHelper::getCurrentDay());
+                $this->dataUpdateLogService->save($lastDailyDataUpdate);
             }
-            $lastDailyDataUpdate = new DataUpdateLog();
-            $lastDailyDataUpdate->setType(DataUpdateTypes::Daily);
-            $lastDailyDataUpdate->setUpdateDate(DateHelper::getCurrentDay());
-            $this->dataUpdateLogService->save($lastDailyDataUpdate);
         }
     }
 

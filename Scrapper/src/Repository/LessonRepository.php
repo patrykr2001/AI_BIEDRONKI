@@ -59,4 +59,17 @@ class LessonRepository extends ServiceEntityRepository
     {
         return $this->findAll();
     }
+
+    /**
+     * Removes a Lesson entity.
+     *
+     * @param Lesson $lesson
+     */
+    public function remove(Lesson $lesson): void
+    {
+        $_em = $this->getEntityManager();
+
+        $_em->remove($lesson);
+        $_em->flush();
+    }
 }
