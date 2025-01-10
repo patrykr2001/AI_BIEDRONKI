@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Subject;
 use App\Repository\SubjectRepository;
+use App\Utils\ProgressBarPrinter;
 
 class SubjectService
 {
@@ -41,10 +42,13 @@ class SubjectService
 
     public function saveNewSubjects(array $subjects): void
     {
+        $done = 0;
+        $total = count($subjects);
         foreach ($subjects as $subject) {
             if ($this->subjectRepository->findSubjectByName($subject->getName()) === null) {
                 $this->subjectRepository->saveSubject($subject);
             }
+            ProgressBarPrinter::printProgressBar(++$done, $total);
         }
     }
 }

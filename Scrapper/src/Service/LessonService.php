@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Lesson;
 use App\Repository\LessonRepository;
+use App\Utils\ProgressBarPrinter;
 
 class LessonService
 {
@@ -43,6 +44,8 @@ class LessonService
      */
     public function saveNewLessons(array $lessons): void
     {
+        $done = 0;
+        $total = count($lessons);
         foreach ($lessons as $lesson) {
             try {
                 $dbLesson = $this->lessonRepository->findLessonByTeacherSubjectGroupStartEnd($lesson->getWorkerId(),
@@ -56,6 +59,7 @@ class LessonService
             } catch (\Exception $e) {
                 echo $e->getMessage();
             }
+            ProgressBarPrinter::printProgressBar(++$done, $total);
         }
     }
 

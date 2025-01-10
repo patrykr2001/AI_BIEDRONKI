@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Teacher;
 use App\Repository\TeacherRepository;
+use App\Utils\ProgressBarPrinter;
 
 class TeacherService
 {
@@ -41,11 +42,13 @@ class TeacherService
 
     public function saveNewTeachers(array $teachers): void
     {
-        $newTeachers = [];
+        $done = 0;
+        $total = count($teachers);
         foreach ($teachers as $teacher) {
             if ($this->teacherRepository->findTeacherByName($teacher->getName()) === null) {
                 $this->teacherRepository->saveTeacher($teacher);
             }
+            ProgressBarPrinter::printProgressBar(++$done, $total);
         }
     }
 }

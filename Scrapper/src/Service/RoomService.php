@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Room;
 use App\Repository\RoomRepository;
+use App\Utils\ProgressBarPrinter;
 
 class RoomService
 {
@@ -41,10 +42,13 @@ class RoomService
 
     public function saveNewRooms(array $rooms): void
     {
+        $done = 0;
+        $total = count($rooms);
         foreach ($rooms as $room) {
             if ($this->roomRepository->findRoomByName($room->getName()) === null) {
                 $this->roomRepository->saveRoom($room);
             }
+            ProgressBarPrinter::printProgressBar(++$done, $total);
         }
     }
 }
