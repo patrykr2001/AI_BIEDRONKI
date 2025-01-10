@@ -346,6 +346,8 @@ class ZutDataUpdater{
                 return LessonForms::Lecture;
             case 'audytoryjne':
                 return LessonForms::Auditory;
+            case 'terenowe':
+                return LessonForms::Field;
             default:
                 $this->output->writeln('<error>Unknown lesson form: ' . $lessonForm . '</error>');
                 return LessonForms::Lecture;
