@@ -57,6 +57,8 @@ class LessonService
                     $this->lessonRepository->save($lesson);
                 }
                 $dbLesson = null;
+            } catch (\Throwable $e) {
+                echo $e->getMessage();
             } catch (\Exception $e) {
                 echo $e->getMessage();
             }

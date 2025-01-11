@@ -71,25 +71,19 @@ class LessonRepository extends ServiceEntityRepository
     public function findLessonByTeacherSubjectGroupStartEnd(Teacher  $teacher, Subject $subject, ?Group $group,
                                                             DateTime $start, DateTime $end): ?Lesson
     {
-        try {
-            return $this->createQueryBuilder('l')
-                ->andWhere('l.workerId = :teacher')
-                ->andWhere('l.subjectId = :subject')
-                ->andWhere('l.groupId = :group')
-                ->andWhere('l.startDate >= :start')
-                ->andWhere('l.endDate <= :end')
-                ->setParameter('teacher', $teacher)
-                ->setParameter('subject', $subject)
-                ->setParameter('group', $group)
-                ->setParameter('start', $start)
-                ->setParameter('end', $end)
-                ->getQuery()
-                ->getOneOrNullResult();
-        } catch (\Exception $e) {
-            echo $e->getMessage();
-            return null;
-        }
-
+        return $this->createQueryBuilder('l')
+            ->andWhere('l.workerId = :teacher')
+            ->andWhere('l.subjectId = :subject')
+            ->andWhere('l.groupId = :group')
+            ->andWhere('l.startDate >= :start')
+            ->andWhere('l.endDate <= :end')
+            ->setParameter('teacher', $teacher)
+            ->setParameter('subject', $subject)
+            ->setParameter('group', $group)
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     /**
