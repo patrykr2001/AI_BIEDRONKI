@@ -10,7 +10,7 @@ class ProgressBarPrinter
             return;
         }
 
-        if ($done % $step !== 0) {
+        if ($done % $step !== 0 && $done !== $total) {
             return;
         }
 
