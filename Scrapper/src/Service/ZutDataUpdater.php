@@ -15,6 +15,7 @@ use App\Enum\LessonStatuses;
 use App\Enum\ZutDataKinds;
 use App\Enum\ZutScheduleDataKinds;
 use App\Utils\DateHelper;
+use App\Utils\ZutUrlBuilder;
 use DateTime;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
