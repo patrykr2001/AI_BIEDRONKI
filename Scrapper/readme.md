@@ -44,9 +44,9 @@ php bin/console app:scrap_zut_api --no-debug --env=prod
 
 2. Make it executable
 
-   ```bash
-    chmod +x scrapper_script.sh
-   ```
+ ```bash
+ chmod +x scrapper_script.sh
+ ```
 
 3. Run crontab -e.
    
