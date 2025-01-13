@@ -157,7 +157,7 @@ class ZutDataUpdater
             } else {
                 $this->output->writeln('<info>Updating daily data...</info>');
                 $this->updateTeachersScheduleData(DateHelper::getTodayStart(), DateHelper::getTommorowStart());
-                $this->updateStudentsGroupsData(DateHelper::getTodayStart(), DateHelper::getTommorowStart());
+//                $this->updateStudentsGroupsData(DateHelper::getTodayStart(), DateHelper::getTommorowStart());
                 $lastDailyDataUpdate = new DataUpdateLog();
                 $lastDailyDataUpdate->setType(DataUpdateTypes::Daily);
                 $lastDailyDataUpdate->setUpdateDate(DateHelper::getTodayWithHour());
