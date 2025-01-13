@@ -13,11 +13,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'app:scrap_zut_api', description: 'Run scrapper for ZUT API')]
 class ScrapZutApiCommand extends Command
 {
-    private ZutDataUpdater $zutDataUpdater;
-
-    public function __construct(ZutDataUpdater $zutDataUpdater)
+    public function __construct(private readonly ZutDataUpdater $zutDataUpdater)
     {
-        $this->zutDataUpdater = $zutDataUpdater;
         parent::__construct();
     }
 
