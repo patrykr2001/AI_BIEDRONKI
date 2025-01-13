@@ -20,7 +20,8 @@ use DateTime;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class ZutDataUpdater{
+class ZutDataUpdater
+{
     private HttpClientInterface $client;
     private ZutUrlBuilder $urlBuilder;
     private OutputInterface $output;
@@ -33,7 +34,7 @@ class ZutDataUpdater{
 
     public function __construct(HttpClientInterface $client, RoomService $roomService, TeacherService $teacherService,
                                 SubjectService $subjectService, DataUpdateLogService $dataUpdateLogService,
-                                LessonService $lessonService, GroupService $groupService)
+                                LessonService  $lessonService, GroupService $groupService)
     {
         $url = (new ConfigReader())->getApiBaseUrl();
         $this->client = $client;
@@ -51,7 +52,8 @@ class ZutDataUpdater{
         $this->output = $output;
     }
 
-    public function updateZutData(): void{
+    public function updateZutData(): void
+    {
         $this->updateMonthlyData();
         $this->updateWeeklyData();
         $this->updateDailyData();
@@ -168,22 +170,34 @@ class ZutDataUpdater{
     private function updateSpecificZutData(ZutDataKinds $kind): void
     {
         $this->output->writeln('<info>Fetching ' . $kind->name . ' data from API...</info>');
-        $response = $this->client->request('GET', $this->urlBuilder->buildDataUrl($kind, ''), [
-            'headers' => [
-                'Accept-Charset' => 'UTF-8',
-            ],
-        ]);
 
-        if ($response->getStatusCode() !== 200) {
-            $this->output->writeln('<error>Failed to fetch '.$kind->name.' data from API.</error>');
+        $response = null;
+
+        for ($i = 0; $i < 10; $i++) {
+            try {
+                $response = $this->client->request('GET', $this->urlBuilder->buildDataUrl($kind, ''), [
+                    'headers' => [
+                        'Accept-Charset' => 'UTF-8',
+                    ],
+                ]);
+                if ($response->getStatusCode() === 200) {
+                    break;
+                }
+            } catch (\Throwable $e) {
+                $this->output->writeln('<error>Failed to fetch ' . $kind->name . ' data from API. Trying again in 5 seconds.</error>');
+                sleep(5);
+            }
+        }
+
+        $data = null;
+        try {
+            $data = $response->getContent();
+        } catch (\Throwable $e) {
+            $this->output->writeln('<error>Failed to fetch ' . $kind->name . ' data from API.</error>');
             return;
         }
+
         $this->output->writeln('<info>Successfully fetched ' . $kind->name . ' data from API.</info>');
-
-        $data = $response->getContent();
-
-//        $processedData = $this->processData($data);
-//        file_put_contents($kind->name.'.json', $processedData);
 
         $this->output->writeln('<info>Processing ' . $kind->name . ' data...</info>');
 
@@ -224,7 +238,7 @@ class ZutDataUpdater{
 
         $objects = null;
 
-        $this->output->writeln('<info>Data successfully fetched and saved '.$kind->name.' data.</info>');
+        $this->output->writeln('<info>Data successfully fetched and saved ' . $kind->name . ' data.</info>');
         gc_collect_cycles();
     }
 
@@ -246,22 +260,36 @@ class ZutDataUpdater{
 
             $this->output->writeln('<info>Fetching ' . $teacherString . ' schedule data from API...</info>');
 
-            $response = $this->client->request('GET', $this->urlBuilder
-                ->buildScheduleUrl($data, $start, $end), [
-                'headers' => [
-                    'Accept-Charset' => 'UTF-8',
-                ],
-            ]);
+            $response = null;
 
-            if ($response->getStatusCode() !== 200) {
+            for ($i = 0; $i < 10; $i++) {
+                try {
+                    $response = $this->client->request('GET', $this->urlBuilder
+                        ->buildScheduleUrl($data, $start, $end), [
+                        'headers' => [
+                            'Accept-Charset' => 'UTF-8',
+                        ],
+                    ]);
+
+                    if ($response->getStatusCode() === 200) {
+                        break;
+                    }
+                } catch (\Throwable $e) {
+                    $this->output->writeln('<error>Failed to fetch ' . $teacherString . ' schedule data from API. Trying again in 5 seconds.</error>');
+                    sleep(5);
+                }
+            }
+
+            $data = null;
+
+            try {
+                $data = $response->getContent();
+            } catch (\Throwable $e) {
                 $this->output->writeln('<error>Failed to fetch ' . $teacherString . ' schedule data from API.</error>');
-                continue;
+                return;
             }
             $this->output->writeln('<info>Successfully fetched ' . $teacherString . ' schedule data from API.</info>');
 
-            $data = $response->getContent();
-//            $processedData = $this->processData($data);
-//            file_put_contents($teacher.'.json', $processedData);
             $this->output->writeln('<info>Processing ' . $teacherString . ' schedule data...</info>');
 
             $processedData = $this->processJsonData($data);
@@ -276,7 +304,6 @@ class ZutDataUpdater{
             $dataCount += count($processedData);
 
             foreach ($processedData as $item) {
-//                $this->output->writeln(json_encode($item, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
                 $teacher = $this->teacherService->getTeacherByName($item['worker']);
                 $lessonStatus = $this->mapLessonStatus($item['status_item']);
                 $hours = $item['hours'];
