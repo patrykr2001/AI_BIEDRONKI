@@ -42,14 +42,22 @@ php bin/console app:scrap_zut_api --no-debug --env=prod
  chmod 644 "${PIDFILE}"
  ```
 
-2. Run crontab -e.
+2. Make it executable
+
+   ```bash
+    chmod +x scrapper_script.sh
+   ```
+
+3. Run crontab -e.
    
  ```bash
  crontab -e
  ```
 
-3. Add new record.
+4. Add new record.
    
  ```bash
- */30 * * * * $HOME/scrapper_script.sh
+ */30 * * * * bash $HOME/scrapper_script.sh
  ```
+
+5. Save crontab.
