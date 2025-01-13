@@ -22,29 +22,16 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class ZutDataUpdater
 {
-    private HttpClientInterface $client;
     private ZutUrlBuilder $urlBuilder;
     private OutputInterface $output;
-    private RoomService $roomService;
-    private TeacherService $teacherService;
-    private SubjectService $subjectService;
-    private DataUpdateLogService $dataUpdateLogService;
-    private LessonService $lessonService;
-    private GroupService $groupService;
 
-    public function __construct(HttpClientInterface $client, RoomService $roomService, TeacherService $teacherService,
-                                SubjectService $subjectService, DataUpdateLogService $dataUpdateLogService,
-                                LessonService  $lessonService, GroupService $groupService)
+    public function __construct(private readonly HttpClientInterface  $client, private readonly RoomService $roomService,
+                                private readonly TeacherService       $teacherService, private readonly SubjectService $subjectService,
+                                private readonly DataUpdateLogService $dataUpdateLogService, private readonly LessonService $lessonService,
+                                private readonly GroupService         $groupService, private readonly StudentService $studentService)
     {
         $url = (new ConfigReader())->getApiBaseUrl();
-        $this->client = $client;
         $this->urlBuilder = new ZutUrlBuilder($url);
-        $this->roomService = $roomService;
-        $this->teacherService = $teacherService;
-        $this->subjectService = $subjectService;
-        $this->dataUpdateLogService = $dataUpdateLogService;
-        $this->lessonService = $lessonService;
-        $this->groupService = $groupService;
     }
 
     public function updateOutput(OutputInterface $output): void
@@ -88,6 +75,7 @@ class ZutDataUpdater
                 $startDate = new DateTime($config->getDateRange()['start']);
                 $endDate = new DateTime($config->getDateRange()['end']);
                 $this->updateTeachersScheduleData($startDate, $endDate);
+                $this->updateStudentsGroupsData($startDate, $endDate, false);
                 $lastMontlyDataUpdate = new DataUpdateLog();
                 $lastMontlyDataUpdate->setType(DataUpdateTypes::Monthly);
                 $lastMontlyDataUpdate->setUpdateDate(DateHelper::getCurrentDay());
@@ -118,8 +106,10 @@ class ZutDataUpdater
                 $this->output->writeln('<info>Updating weekly data...</info>');
                 $currentDate = DateHelper::getCurrentWeek();
                 $this->updateTeachersScheduleData($currentDate[0], $currentDate[1]);
+                $this->updateStudentsGroupsData($currentDate[0], $currentDate[1]);
                 $currentDate = DateHelper::getNextWeek();
                 $this->updateTeachersScheduleData($currentDate[0], $currentDate[1]);
+                $this->updateStudentsGroupsData($currentDate[0], $currentDate[1]);
                 $lastWeeklyDataUpdate = new DataUpdateLog();
                 $lastWeeklyDataUpdate->setType(DataUpdateTypes::Weekly);
                 $lastWeeklyDataUpdate->setUpdateDate(DateHelper::getCurrentWeek()[0]);
@@ -151,6 +141,7 @@ class ZutDataUpdater
             } else {
                 $this->output->writeln('<info>Updating daily data...</info>');
                 $this->updateTeachersScheduleData(DateHelper::getTodayStart(), DateHelper::getTommorowStart());
+                $this->updateStudentsGroupsData(DateHelper::getTodayStart(), DateHelper::getTommorowStart());
                 $lastDailyDataUpdate = new DataUpdateLog();
                 $lastDailyDataUpdate->setType(DataUpdateTypes::Daily);
                 $lastDailyDataUpdate->setUpdateDate(DateHelper::getTodayWithHour());
@@ -165,6 +156,13 @@ class ZutDataUpdater
 //        $teachers[] = 'Abramek Karol';
         $teachers = array_map(fn($teacher) => $teacher->getName(), $this->teacherService->getAllTeachers());
         $this->updateSpecificTeachersScheduleData($teachers, $start, $end);
+    }
+
+    private function updateStudentsGroupsData(Datetime $start, Datetime $end, bool $onlyNew = true): void
+    {
+        $students = [];
+        $students = array_map(fn($student) => $student->getNumber(), $this->studentService->getAllStudents());
+        $this->updateSpecificStudentGroups($students, $start, $end, $onlyNew);
     }
 
     private function updateSpecificZutData(ZutDataKinds $kind): void
@@ -249,6 +247,84 @@ class ZutDataUpdater
             return trim($input);
         }
         return trim(substr($input, 0, $position));
+    }
+
+    private function updateSpecificStudentGroups(array $students, DateTime $start, DateTime $end, bool $onlyNew = true): void
+    {
+        foreach ($students as $studentString) {
+            $data = [ZutScheduleDataKinds::Student->value => $studentString];
+
+            $this->output->writeln('<info>Fetching ' . $studentString . ' groups data from API...</info>');
+
+            $response = null;
+
+            for ($i = 0; $i < 10; $i++) {
+                try {
+                    $response = $this->client->request('GET', $this->urlBuilder
+                        ->buildScheduleUrl($data, $start, $end), [
+                        'headers' => [
+                            'Accept-Charset' => 'UTF-8',
+                        ],
+                    ]);
+
+                    if ($response->getStatusCode() === 200) {
+                        break;
+                    }
+                } catch (\Throwable $e) {
+                    $this->output->writeln('<error>Failed to fetch ' . $studentString . ' groups data from API. Trying again in 5 seconds.</error>');
+                    sleep(5);
+                }
+            }
+
+            $data = null;
+
+            try {
+                $data = $response->getContent();
+            } catch (\Throwable $e) {
+                $this->output->writeln('<error>Failed to fetch ' . $studentString . ' groups data from API.</error>');
+                return;
+            }
+            $this->output->writeln('<info>Successfully fetched ' . $studentString . ' groups data from API.</info>');
+
+            $this->output->writeln('<info>Processing ' . $studentString . ' groups data...</info>');
+
+            $processedData = $this->processJsonData($data);
+            if (count($processedData) === 0) {
+                $this->output->writeln('<info>No data to process for ' . $studentString . ' groups data.</info>');
+                continue;
+            }
+
+            $this->output->writeln('<info>Saving ' . $studentString . ' groups data...</info>');
+
+            $objects = [];
+
+            foreach ($processedData as $item) {
+                $group = null;
+                if ($item['group_name'] !== null) {
+                    $groupName = $item['group_name'];
+                    if ($this->groupService->getGroupByName($groupName) !== null) {
+                        $group = $this->groupService->getGroupByName($groupName);
+                    } else {
+                        $group = new Group();
+                        $group->setName($groupName);
+                        $this->groupService->save($group);
+                    }
+                }
+                if ($group !== null) {
+                    $objects[] = $group;
+                }
+            }
+
+            $this->studentService->updateGroups($objects, $studentString, $onlyNew);
+
+            $data = null;
+            $processedData = null;
+            $objects = null;
+
+            $this->output->writeln('<info>Data successfully fetched and saved ' . $studentString
+                . ' groups data.</info>');
+            gc_collect_cycles();
+        }
     }
 
     private function updateSpecificTeachersScheduleData(array $teachers, DateTime $start, DateTime $end): void
@@ -373,7 +449,8 @@ class ZutDataUpdater
             $processedData = null;
             $objects = null;
 
-            $this->output->writeln('<info>Data successfully fetched and saved ' . $teacherString . ' schedule data.</info>');
+            $this->output->writeln('<info>Data successfully fetched and saved ' . $teacherString
+                . ' schedule data.</info>');
             $this->output->writeln('<info>Number of lessons: ' . $dataCount . '</info>');
             gc_collect_cycles();
         }
