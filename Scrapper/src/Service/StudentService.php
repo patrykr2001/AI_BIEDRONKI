@@ -36,5 +36,7 @@ class StudentService
         } else {
             $this->studentRepository->updateStudentGroupsAll($groups, $number);
         }
+
+        $this->studentRepository->clearCache();
     }
 }

@@ -22,16 +22,32 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class ZutDataUpdater
 {
+    private HttpClientInterface $client;
     private ZutUrlBuilder $urlBuilder;
     private OutputInterface $output;
+    private RoomService $roomService;
+    private TeacherService $teacherService;
+    private SubjectService $subjectService;
+    private DataUpdateLogService $dataUpdateLogService;
+    private LessonService $lessonService;
+    private GroupService $groupService;
+    private StudentService $studentService;
 
-    public function __construct(private readonly HttpClientInterface  $client, private readonly RoomService $roomService,
-                                private readonly TeacherService       $teacherService, private readonly SubjectService $subjectService,
-                                private readonly DataUpdateLogService $dataUpdateLogService, private readonly LessonService $lessonService,
-                                private readonly GroupService         $groupService, private readonly StudentService $studentService)
+    public function __construct(HttpClientInterface $client, RoomService $roomService, TeacherService $teacherService,
+                                SubjectService      $subjectService, DataUpdateLogService $dataUpdateLogService,
+                                LessonService       $lessonService, GroupService $groupService,
+                                StudentService      $studentService)
     {
         $url = (new ConfigReader())->getApiBaseUrl();
         $this->urlBuilder = new ZutUrlBuilder($url);
+        $this->client = $client;
+        $this->roomService = $roomService;
+        $this->teacherService = $teacherService;
+        $this->subjectService = $subjectService;
+        $this->dataUpdateLogService = $dataUpdateLogService;
+        $this->lessonService = $lessonService;
+        $this->groupService = $groupService;
+        $this->studentService = $studentService;
     }
 
     public function updateOutput(OutputInterface $output): void
@@ -161,7 +177,9 @@ class ZutDataUpdater
     private function updateStudentsGroupsData(Datetime $start, Datetime $end, bool $onlyNew = true): void
     {
         $students = [];
+//        $students[] = '51399';
         $students = array_map(fn($student) => $student->getNumber(), $this->studentService->getAllStudents());
+
         $this->updateSpecificStudentGroups($students, $start, $end, $onlyNew);
     }
 
