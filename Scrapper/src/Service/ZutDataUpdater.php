@@ -57,6 +57,10 @@ class ZutDataUpdater{
         $this->updateDailyData();
     }
 
+    /***
+     * Updates monthly data if last update was more than 30 days ago.
+     * Monthly data includes teachers, groups, subjects, rooms and lessons for the semester.
+     */
     private function updateMonthlyData(): void
     {
         $lastMontlyDataUpdate = $this->dataUpdateLogService->findLastByType(DataUpdateTypes::Monthly);
@@ -90,22 +94,27 @@ class ZutDataUpdater{
         }
     }
 
+    /***
+     * Updates weekly data if last update was more than 1 days ago.
+     * Weekly data includes lessons for the current and next week.
+     */
     private function updateWeeklyData(): void
     {
         $lastWeeklyDataUpdate = $this->dataUpdateLogService->findLastByType(DataUpdateTypes::Weekly);
         if ($lastWeeklyDataUpdate === null) {
             $lastWeeklyDataUpdate = new DataUpdateLog();
             $lastWeeklyDataUpdate->setType(DataUpdateTypes::Weekly);
-            $lastWeeklyDataUpdate->setUpdateDate(DateHelper::getPreviousWeek()[0]);
+            $lastWeeklyDataUpdate->setUpdateDate(DateHelper::getDateYesterday());
         }
         if ($lastWeeklyDataUpdate !== null) {
             $lastUpdateDate = $lastWeeklyDataUpdate->getUpdateDate();
-            $currentDate = DateHelper::getCurrentWeek();
-            $diff = $currentDate[0]->diff($lastUpdateDate);
-            if ($diff->days < 7) {
+            $currentDate = DateHelper::getTodayStart();
+            $diff = $currentDate->diff($lastUpdateDate);
+            if ($diff->days < 1) {
                 $this->output->writeln('<info>There is no need to update weekly data. Last update ' . $lastWeeklyDataUpdate->getUpdateDate()->format('y-m-d') . '. Days from last update ' . $diff->days . '</info>');
             } else {
                 $this->output->writeln('<info>Updating weekly data...</info>');
+                $currentDate = DateHelper::getCurrentWeek();
                 $this->updateTeachersScheduleData($currentDate[0], $currentDate[1]);
                 $currentDate = DateHelper::getNextWeek();
                 $this->updateTeachersScheduleData($currentDate[0], $currentDate[1]);
@@ -117,26 +126,32 @@ class ZutDataUpdater{
         }
     }
 
+    /***
+     * Updates daily data if last update was more than 1 hour ago.
+     * Daily data includes lessons for the current day.
+     */
     private function updateDailyData(): void
     {
         $lastDailyDataUpdate = $this->dataUpdateLogService->findLastByType(DataUpdateTypes::Daily);
         if ($lastDailyDataUpdate === null) {
             $lastDailyDataUpdate = new DataUpdateLog();
             $lastDailyDataUpdate->setType(DataUpdateTypes::Daily);
-            $lastDailyDataUpdate->setUpdateDate(DateHelper::getDateYesterday());
+            $lastDailyDataUpdate->setUpdateDate(DateHelper::getTodayWithHourOneHourAgo());
         }
         if ($lastDailyDataUpdate !== null) {
             $lastUpdateDate = $lastDailyDataUpdate->getUpdateDate();
-            $currentDate = DateHelper::getTodayStart();
+            $currentDate = DateHelper::getCurrentDay();
             $diff = $currentDate->diff($lastUpdateDate);
-            if ($diff->days < 1) {
-                $this->output->writeln('<info>There is no need to update daily data.' . $lastDailyDataUpdate->getUpdateDate()->format('y-m-d') . '. Days from last update ' . $diff->days . '</info>');
+            if ($diff->h < 1 || $diff->days < 1) {
+                $this->output->writeln('<info>There is no need to update daily data. Last update '
+                    . $lastDailyDataUpdate->getUpdateDate()->format('y-m-d H:i') . '. Minutes from last update: '
+                    . $diff->i . '</info>');
             } else {
                 $this->output->writeln('<info>Updating daily data...</info>');
-                $this->updateTeachersScheduleData(DateHelper::getTodayStart(), DateHelper::getTodayEnd());
+                $this->updateTeachersScheduleData(DateHelper::getTodayStart(), DateHelper::getTommorowStart());
                 $lastDailyDataUpdate = new DataUpdateLog();
                 $lastDailyDataUpdate->setType(DataUpdateTypes::Daily);
-                $lastDailyDataUpdate->setUpdateDate(DateHelper::getCurrentDay());
+                $lastDailyDataUpdate->setUpdateDate(DateHelper::getTodayWithHour());
                 $this->dataUpdateLogService->save($lastDailyDataUpdate);
             }
         }
