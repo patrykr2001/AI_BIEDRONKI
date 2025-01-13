@@ -142,7 +142,7 @@ class ZutDataUpdater{
             $lastUpdateDate = $lastDailyDataUpdate->getUpdateDate();
             $currentDate = DateHelper::getCurrentDay();
             $diff = $currentDate->diff($lastUpdateDate);
-            if ($diff->h < 1 || $diff->days < 1) {
+            if ($diff->h < 1) {
                 $this->output->writeln('<info>There is no need to update daily data. Last update '
                     . $lastDailyDataUpdate->getUpdateDate()->format('y-m-d H:i') . '. Minutes from last update: '
                     . $diff->i . '</info>');
