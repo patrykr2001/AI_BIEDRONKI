@@ -15,8 +15,8 @@ class Student
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?int $number = null;
+    #[ORM\Column(length: 5)]
+    private ?string $number = null;
 
     /**
      * @var Collection<int, Group>
