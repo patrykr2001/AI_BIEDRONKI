@@ -1,3 +1,4 @@
+
 import './bootstrap.js';
 /*
  * Welcome to your app's main JavaScript file!
@@ -8,3 +9,12 @@ import './bootstrap.js';
 
 // any CSS you import will output into a single css file (app.css in this case)
 import './styles/app.css';
+import {Calendar} from 'fullcalendar'
+
+const calendarEl = document.getElementById('calendar');
+
+const calendar = new Calendar(calendarEl, {
+    plugins: [dayGridPlugin]
+});
+
+calendar.render();
