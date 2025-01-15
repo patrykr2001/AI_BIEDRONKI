@@ -42,6 +42,24 @@ class DateHelper
         return new DateTime();
     }
 
+    public static function getTodayWithHourOneHourAgo(): DateTime
+    {
+        $date = new DateTime();
+        $date->modify('-1 hour');
+        return $date->setTime($date->format('H'), 0);
+    }
+
+    public static function getTodayWithHour(): DateTime
+    {
+        $date = new DateTime();
+        return $date->setTime($date->format('H'), 0);
+    }
+
+    public static function getCurrentDayWithSpecificHour(int $hour, int $minute = 0): DateTime
+    {
+        return (new DateTime())->setTime($hour, $minute);
+    }
+
     public static function getTodayStart(): DateTime
     {
         return (new DateTime())->setTime(0, 0);
@@ -50,6 +68,11 @@ class DateHelper
     public static function getTodayEnd(): DateTime
     {
         return (new DateTime())->setTime(23, 59);
+    }
+
+    public static function getTommorowStart(): DateTime
+    {
+        return (new DateTime())->modify('+1 day')->setTime(0, 0);
     }
 
     public static function getCurrentMonth(): array

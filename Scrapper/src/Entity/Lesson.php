@@ -78,12 +78,12 @@ class Lesson
         return $this;
     }
 
-    public function getHours(): ?int
+    public function getHours(): ?float
     {
         return $this->hours;
     }
 
-    public function setHours(int $hours): static
+    public function setHours(float $hours): static
     {
         $this->hours = $hours;
 

@@ -15,8 +15,8 @@ class Student
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?int $number = null;
+    #[ORM\Column(length: 5)]
+    private ?string $number = null;
 
     /**
      * @var Collection<int, Group>
@@ -34,12 +34,12 @@ class Student
         return $this->id;
     }
 
-    public function getNumber(): ?int
+    public function getNumber(): ?string
     {
         return $this->number;
     }
 
-    public function setNumber(int $number): static
+    public function setNumber(string $number): static
     {
         $this->number = $number;
 

@@ -46,7 +46,7 @@ class SubjectService
         $total = count($subjects);
         foreach ($subjects as $subject) {
             if ($this->subjectRepository->findSubjectByName($subject->getName()) === null) {
-                $this->subjectRepository->saveSubject($subject);
+                $this->subjectRepository->save($subject);
             }
             ProgressBarPrinter::printProgressBar(++$done, $total, step: 50);
         }
