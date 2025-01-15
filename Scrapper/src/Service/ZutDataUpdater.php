@@ -125,7 +125,7 @@ class ZutDataUpdater
                 $this->updateStudentsGroupsData($currentDate[0], $currentDate[1]);
                 $currentDate = DateHelper::getNextWeek();
                 $this->updateTeachersScheduleData($currentDate[0], $currentDate[1]);
-                $this->updateStudentsGroupsData($currentDate[0], $currentDate[1]);
+//                $this->updateStudentsGroupsData($currentDate[0], $currentDate[1]);
                 $lastWeeklyDataUpdate = new DataUpdateLog();
                 $lastWeeklyDataUpdate->setType(DataUpdateTypes::Weekly);
                 $lastWeeklyDataUpdate->setUpdateDate(DateHelper::getCurrentWeek()[0]);
