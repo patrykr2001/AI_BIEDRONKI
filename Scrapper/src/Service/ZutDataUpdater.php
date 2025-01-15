@@ -122,7 +122,7 @@ class ZutDataUpdater
                 $this->output->writeln('<info>Updating weekly data...</info>');
                 $currentDate = DateHelper::getCurrentWeek();
                 $this->updateTeachersScheduleData($currentDate[0], $currentDate[1]);
-                $this->updateStudentsGroupsData($currentDate[0], $currentDate[1]);
+//                $this->updateStudentsGroupsData($currentDate[0], $currentDate[1]);
                 $currentDate = DateHelper::getNextWeek();
                 $this->updateTeachersScheduleData($currentDate[0], $currentDate[1]);
 //                $this->updateStudentsGroupsData($currentDate[0], $currentDate[1]);
