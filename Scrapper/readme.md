@@ -36,7 +36,9 @@ php bin/console app:scrap_zut_api --no-debug --env=prod
      exit 99
  fi
 
- (cd "$HOME/git/AI_BIEDRONKI/Scrapper"; php bin/console app:scrap_zut_api --no-debug --env=prod) >> $HOME/tmp/scrapper.log &
+ CURRENTDATE=`date +"%d%m%Y_%H%M"`
+
+ (cd "$HOME/git/AI_BIEDRONKI/Scrapper"; php bin/console app:scrap_zut_api --no-debug --env=prod) >> $HOME/tmp/scrapper_$CURRENTDATE.log &
 
  echo $! > "${PIDFILE}"
  chmod 644 "${PIDFILE}"
