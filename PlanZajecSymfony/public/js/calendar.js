@@ -1,13 +1,17 @@
+// public/js/counter.js
+
 document.addEventListener('DOMContentLoaded', () => {
+    const addButton = document.getElementById('addButton');
+    const container = document.getElementById('tabsBar');
 
+    addButton.addEventListener('click', handleAddTabClick);
+    const firstTab = document.getElementById('tab-1');
+    firstTab.addEventListener('click',handleTabClick);
 
-    const calendarEl = document.getElementById('calendar');
+    renderNewCalendar('calendar-1');
 
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth'
-    });
-
-    calendar.render();
 
 
 });
+
+
