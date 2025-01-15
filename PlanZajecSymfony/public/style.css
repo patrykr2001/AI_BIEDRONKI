@@ -1,0 +1,34 @@
+body{
+
+    background-color: darkgrey;
+
+}
+/*TODO ogarnar te radoisy dp procentow*/
+.calendar-tab{
+
+    border-style: solid;
+    border-color: black;
+    border-radius: 5% 60% 10% 1%;
+    min-width: 5%;
+    text-align: center;
+
+}
+
+.calendar-slide{
+
+    padding: 0 10%;
+    border-style: solid;
+    min-height: 100%;
+    background: white;
+    grid-area: overlap;
+
+}
+
+#calendar-gallery{
+
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas: "overlap";
+
+}

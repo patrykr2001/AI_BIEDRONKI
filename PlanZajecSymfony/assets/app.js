@@ -9,11 +9,3 @@ import './bootstrap.js';
 
 // any CSS you import will output into a single css file (app.scss in this case)
 import './styles/app.scss';
-
-const calendarEl = document.getElementById('calendar');
-
-const calendar = new Calendar(calendarEl, {
-    plugins: [dayGridPlugin]
-});
-
-calendar.render();
