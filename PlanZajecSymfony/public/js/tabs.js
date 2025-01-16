@@ -30,11 +30,11 @@ function handleAddTabClick(){
     newTab.addEventListener('click', handleTabClick);
 
     const newCalendar = document.createElement('div');
-    newCalendar.className = 'container h-100 calendar-slide';
+    newCalendar.className = 'container calendar-slide';
     newCalendar.id = 'calendar-' + (lastValue + 1);
     newCalendar.style.zIndex = '1';
 
-    const gallery = document.getElementById('calendar-gallery');
+    const gallery = document.getElementById('slides_wrapper');
     gallery.appendChild(newCalendar);
 
     renderNewCalendar(newCalendar.id)
@@ -43,10 +43,11 @@ function handleAddTabClick(){
 }
 
 
-
+//! nie działa dla tab-1...
 function handleTabClick(event) {
 
-    const tabText = event.target.textContent;
+    const targetTab = event.target;
+    const tabText = targetTab.textContent;
     const targetCalendarId = 'calendar-' + tabText;
 
 
@@ -54,6 +55,15 @@ function handleTabClick(event) {
         element.style.zIndex = '1';
     });
 
+    document.querySelectorAll('.calendar-tab').forEach(element => {
+        element.classList.remove("active-tab")
+    });
+
+
+
+    targetTab.classList.add("active-tab");
+
+    console.log(targetCalendarId)
 
     const targetCalendar = document.getElementById(targetCalendarId);
     targetCalendar.style.zIndex = '2';

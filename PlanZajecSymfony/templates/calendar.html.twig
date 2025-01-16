@@ -13,18 +13,48 @@
 <body>
 
     <div class="d-flex container justify-content-center align-items-center">
+
         <div class="container pa d-flex flex-row overflow-auto" id="tabsBar">
             <div class="box calendar-tab"
-                 id="tab-1">1</div>
+                 id="tab-1">1
+            </div>
             <div class="box box-add calendar-tab"
                  id="addButton">+
             </div>
         </div>
     </div>
-    <div id="calendar-gallery">
-        <div class = "container h-100 calendar-slide"
-             id="calendar-1"
-             style="z-index: 2;">
+
+    <!-- calendar part -->
+    <div class="d-flex container flex-row" id="calendar-gallery">
+        <div class="container w-25 filters-container" id="filters-1">
+            <p class="text-start mb-1">Wykładowca</p>
+            <div class="input-group mb-1">
+                <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+            </div>
+            <p class="text-start mb-1">Sala</p>
+            <div class="input-group mb-1">
+                <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+            </div>
+            <p class="text-start mb-1">Przedmiot</p>
+            <div class="input-group mb-1">
+                <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+            </div>
+            <p class="text-start mb-1">Grupa</p>
+            <div class="input-group mb-1">
+                <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+            </div>
+            <p class="text-start mb-1">Numer albumu</p>
+            <div class="input-group mb-1">
+                <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+            </div>
+            <div class="text-center">
+                <button class="btn btn-primary">Wyszukaj</button>
+                <button class="btn btn-light">Wyczyść filtry</button>
+            </div>
+        </div>
+        <div class="container w-75 h-100" id="slides_wrapper">
+            <div class="container calendar-slide" id="calendar-1">
+            </div>
         </div>
     </div>
 

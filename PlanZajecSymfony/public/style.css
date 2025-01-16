@@ -4,13 +4,20 @@ body{
 
 }
 /*TODO ogarnar te radoisy dp procentow*/
-.calendar-tab{
+.calendar-tab, .add-tab{
 
     border-style: solid;
     border-color: black;
     border-radius: 5% 60% 10% 1%;
     min-width: 5%;
     text-align: center;
+
+}
+
+.filters-button{
+
+    display:block;
+    margin: 0;
 
 }
 
@@ -24,11 +31,18 @@ body{
 
 }
 
-#calendar-gallery{
+#slides_wrapper{
 
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: 1fr;
     grid-template-areas: "overlap";
+    border-style: solid;
+
+}
+
+.active-tab{
+
+    background-color: cadetblue;
 
 }
