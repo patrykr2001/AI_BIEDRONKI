@@ -21,7 +21,7 @@ body{
 
 }
 
-.calendar-slide{
+.calendar-slide, .filters-container{
 
     padding: 0 10%;
     border-style: solid;
@@ -31,7 +31,7 @@ body{
 
 }
 
-#slides_wrapper{
+#slides_wrapper, #filters-wrapper{
 
     display: grid;
     grid-template-columns: 1fr;
@@ -40,6 +40,8 @@ body{
     border-style: solid;
 
 }
+
+
 
 .active-tab{
 

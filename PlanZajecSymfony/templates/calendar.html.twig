@@ -24,32 +24,33 @@
         </div>
     </div>
 
-    <!-- calendar part -->
     <div class="d-flex container flex-row" id="calendar-gallery">
-        <div class="container w-25 filters-container" id="filters-1">
-            <p class="text-start mb-1">Wykładowca</p>
-            <div class="input-group mb-1">
-                <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
-            </div>
-            <p class="text-start mb-1">Sala</p>
-            <div class="input-group mb-1">
-                <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
-            </div>
-            <p class="text-start mb-1">Przedmiot</p>
-            <div class="input-group mb-1">
-                <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
-            </div>
-            <p class="text-start mb-1">Grupa</p>
-            <div class="input-group mb-1">
-                <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
-            </div>
-            <p class="text-start mb-1">Numer albumu</p>
-            <div class="input-group mb-1">
-                <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
-            </div>
-            <div class="text-center">
-                <button class="btn btn-primary">Wyszukaj</button>
-                <button class="btn btn-light">Wyczyść filtry</button>
+        <div class="container w-25" id="filters-wrapper">
+            <div class="container filters-container" id="filters-1">
+                <p class="text-start mb-1">Wykładowca</p>
+                <div class="input-group mb-1">
+                    <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                </div>
+                <p class="text-start mb-1">Sala</p>
+                <div class="input-group mb-1">
+                    <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                </div>
+                <p class="text-start mb-1">Przedmiot</p>
+                <div class="input-group mb-1">
+                    <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                </div>
+                <p class="text-start mb-1">Grupa</p>
+                <div class="input-group mb-1">
+                    <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                </div>
+                <p class="text-start mb-1">Numer albumu</p>
+                <div class="input-group mb-1">
+                    <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                </div>
+                <div class="text-center">
+                    <button class="btn btn-primary">Wyszukaj</button>
+                    <button class="btn btn-light">Wyczyść filtry</button>
+                </div>
             </div>
         </div>
         <div class="container w-75 h-100" id="slides_wrapper">
@@ -62,6 +63,7 @@
 
     <script src="../{{ asset('js/calendar.js') }}"></script>
     <script src="../{{ asset('js/tabs.js') }}"></script>
+    <script src="../{{ asset('js/filters.js') }}"></script>
 </body>
 {#    <div>#}
 {#        <div class = "container h-100" id="calendar"></div>#}
