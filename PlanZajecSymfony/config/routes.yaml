@@ -3,3 +3,18 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+groups:
+    resource: '../src/Controller/ApiGroupController.php'
+    type: attribute
+rooms:
+    resource: '../src/Controller/ApiRoomController.php'
+    type: attribute
+teachers:
+    resource: '../src/Controller/ApiTeacherController.php'
+    type: attribute
+subjects:
+    resource: '../src/Controller/ApiSubjectController.php'
+    type: attribute
+lessons:
+    resource: '../src/Controller/ApiLessonController.php'
+    type: attribute
