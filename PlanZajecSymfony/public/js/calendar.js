@@ -1,15 +1,22 @@
-// public/js/counter.js
+
+let globalParsedParams = {}
 
 document.addEventListener('DOMContentLoaded', () => {
-    const addButton = document.getElementById('addButton');
-    const container = document.getElementById('tabsBar');
+    const addButton = document.getElementById('add-button');
+    // const firstTab = document.getElementById('tab-1');
+    const filterButton = document.getElementById('filter-button-1');
 
     addButton.addEventListener('click', handleAddTabClick);
-    const firstTab = document.getElementById('tab-1');
-    firstTab.addEventListener('click',handleTabClick);
-    firstTab.classList.add("active-tab");
+    //
+    // firstTab.addEventListener('click',handleTabClick);
+    // firstTab.classList.add("active-tab");
 
-    renderNewCalendar('calendar-1');
+    filterButton.addEventListener('click', handleFiltering);
+
+    // renderNewCalendar('calendar-1');
+
+    parseUrlParams(urlParams);
+
 
 
 
