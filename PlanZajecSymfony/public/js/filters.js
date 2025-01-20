@@ -1,38 +1,201 @@
-function insertNewFiltersContainer(calendarNumber){
+
+function insertNewFiltersContainer(viewNumber){
 
     const containerHTML = `
-        <div class="container filters-container" style="z-index: 1;" id="filters-${calendarNumber}">
+        <div class="container filters-container" style="z-index: 1;" id="filters-${viewNumber}">
             <p class="text-start mb-1">Wykładowca</p>
             <div class="input-group mb-1">
-                <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" id="wykladowca-input-${viewNumber}">
             </div>
             <p class="text-start mb-1">Sala</p>
             <div class="input-group mb-1">
-                <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" id="sala-input-${viewNumber}">
             </div>
             <p class="text-start mb-1">Przedmiot</p>
             <div class="input-group mb-1">
-                <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+
+                <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" id="przedmiot-input-${viewNumber}">
             </div>
             <p class="text-start mb-1">Grupa</p>
+
             <div class="input-group mb-1">
-                <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" id="grupa-input-${viewNumber}">
             </div>
             <p class="text-start mb-1">Numer albumu</p>
             <div class="input-group mb-1">
-                <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" id="album-input-${viewNumber}">
             </div>
             <div class="text-center">
-                <button class="btn btn-primary">Wyszukaj</button>
-                <button class="btn btn-light">Wyczyść filtry</button>
+                <button class="btn btn-primary" id="filter-button-${viewNumber}">Wyszukaj</button>
+                <button class="btn btn-light" id="clean-filters-button-${viewNumber}">Wyczyść filtry</button>
             </div>
         </div>`;
 
     const parentElement = document.getElementById('filters-wrapper')
 
-    console.log(parentElement)
-
     parentElement.insertAdjacentHTML('beforeend', containerHTML);
+
+    const filterButton = document.getElementById('filter-button-' + viewNumber)
+    filterButton.addEventListener('click', handleFiltering)
+
+
+
+}
+
+function saveInitialFilters(viewNumber, filtersValues){
+
+
+    const wykladowcaInputValue = getFilterValue('wykladowca', viewNumber)
+    const salaInputValue = getFilterValue('sala', viewNumber)
+    const przedmiotInputValue = getFilterValue('przedmiot', viewNumber)
+    const grupaInputValue = getFilterValue('grupa', viewNumber)
+    const albumInputValue = getFilterValue('album', viewNumber)
+
+    filtersValues= {
+        "nr" : viewNumber.toString(),
+        "wykladowca" : wykladowcaInputValue,
+        "sala" : salaInputValue,
+        "przedmiot" : przedmiotInputValue,
+        "grupa" : grupaInputValue,
+        "album" : albumInputValue
+    }
+
+
+        console.log('filtersValues: ', filtersValues)
+
+
+}
+
+function updateUrlFilters(viewNumber){
+
+    console.log('updating URL params')
+    const paramsKey = 'cal' + viewNumber
+    globalParsedParams[paramsKey] = {
+        nr: viewNumber,
+        wykladowca: getFilterValue('wykladowca', viewNumber),
+        sala: getFilterValue('sala', viewNumber),
+        przedmiot: getFilterValue('przedmiot', viewNumber),
+        grupa: getFilterValue('grupa', viewNumber),
+        album: getFilterValue('album', viewNumber)
+    }
+
+    //TODO: dodac obsluge kiedy WSZYSTKIE filtry sa puste
+
+    console.log(globalParsedParams)
+
+    const urlParams = new URLSearchParams();
+
+    for (const outerKey in globalParsedParams) {
+        if (globalParsedParams.hasOwnProperty(outerKey)) {
+            const innerDict = globalParsedParams[outerKey];
+            const nrValue = innerDict['nr'];
+
+            for (const innerKey in innerDict) {
+                if (innerDict.hasOwnProperty(innerKey) && innerKey !== 'nr') {
+                    const value = innerDict[innerKey];
+
+                    if (value !== null && value !== undefined && value !== '') {
+                        const paramName = `cal${nrValue}_${innerKey}`;
+                        urlParams.append(paramName, value);
+                    }
+                }
+            }
+        }
+    }
+
+    const currentUrl = window.location.origin + window.location.pathname;
+
+    const url = new URL(currentUrl);
+
+    const params = new URLSearchParams(urlParams);
+    params.forEach((value, key) => {
+        url.searchParams.append(key, value);
+    });
+
+    window.history.pushState({}, '', url.toString());
+
+}
+
+function getFilterValue(filter, viewNr){
+
+    let filterId = filter.toString() + '-input-' + viewNr.toString()
+    const filterInputElement = document.getElementById(filterId)
+    return filterInputElement.value
+
+}
+
+function setFilterValue(filter, viewNr, value){
+
+    let filterId = filter.toString() + '-input-' + viewNr
+    const filterInputElement = document.getElementById(filterId)
+    filterInputElement.value = value
+
+}
+
+function fetchFilteredData(){
+
+    console.log('getting data')
+
+}
+
+function handleFiltering(event){
+
+    const targetButton = event.target
+    const [filter, button, viewNumber] = targetButton.id.split('-')
+    console.log(viewNumber)
+
+    updateUrlFilters(viewNumber)
+    fetchFilteredData()
+
+
+}
+
+
+function parseUrlParams(urlParams){
+
+    const parsedParams = {};
+
+    const attributes = ['wykladowca', 'sala', 'przedmiot', 'grupa', 'album'];
+
+    for (const [key, value] of Object.entries(urlParams)) {
+        const [prefix, attribute] = key.split('_');
+        const chunks = prefix.match(/.{1,3}/g);
+        console.log(chunks[1])
+        console.log('split na ', prefix, ' ', attribute)
+        if (attributes.includes(attribute)) {
+            if (!parsedParams[prefix]) {
+                parsedParams[prefix] = {
+                    nr: chunks[1],
+                    wykladowca: null,
+                    sala: null,
+                    przedmiot: null,
+                    grupa: null,
+                    album: null
+                };
+            }
+            parsedParams[prefix][attribute] = value;
+        }
+    }
+
+    globalParsedParams = parsedParams
+
+    for( let key in parsedParams)
+    {
+        let filtersDict = parsedParams[key]
+
+        for( let filter in filtersDict)
+        {
+            if(filter === 'nr'){
+                createNewCalendarView(filtersDict['nr'])
+            }else{
+                if(filtersDict[filter] !== null){
+                    setFilterValue(filter.toString(), filtersDict['nr'], filtersDict[filter])
+                }
+            }
+        }
+    }
+
+    //TODO: dodac maly spinner przy ladowaniu danych
 
 
 
