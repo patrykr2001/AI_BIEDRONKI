@@ -104,8 +104,8 @@ function recordToEvent(record) {
 
     let event = {
         // id: record['id'],
-        title: record['wykladowca'] + ' ' + record['przedmiot'],
-        start: record['start']
+        title: record['worker'] + ' ' + record['subject'],
+        start: record['startDate']
     }
 
     console.log('stworzylem event: ', event)
