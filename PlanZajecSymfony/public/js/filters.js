@@ -1,5 +1,4 @@
-
-function insertNewFiltersContainer(viewNumber){
+function insertNewFiltersContainer(viewNumber) {
 
     const containerHTML = `
         <div class="container filters-container" style="z-index: 1;" id="filters-${viewNumber}">
@@ -39,13 +38,10 @@ function insertNewFiltersContainer(viewNumber){
 
     filterButton.addEventListener('click', handleFiltering)
 
-    //TODO: dodac czyszcenie filtrow
-
-
-
+    //TODO: dodac czyszcenie filtrów
 }
 
-function saveInitialFilters(viewNumber, filtersValues){
+function saveInitialFilters(viewNumber, filtersValues) {
 
 
     const wykladowcaInputValue = getFilterValue('wykladowca', viewNumber)
@@ -54,22 +50,19 @@ function saveInitialFilters(viewNumber, filtersValues){
     const grupaInputValue = getFilterValue('grupa', viewNumber)
     const albumInputValue = getFilterValue('album', viewNumber)
 
-    filtersValues= {
-        "nr" : viewNumber.toString(),
-        "wykladowca" : wykladowcaInputValue,
-        "sala" : salaInputValue,
-        "przedmiot" : przedmiotInputValue,
-        "grupa" : grupaInputValue,
-        "album" : albumInputValue
+    filtersValues = {
+        "nr": viewNumber.toString(),
+        "wykladowca": wykladowcaInputValue,
+        "sala": salaInputValue,
+        "przedmiot": przedmiotInputValue,
+        "grupa": grupaInputValue,
+        "album": albumInputValue
     }
 
-
-        console.log('filtersValues: ', filtersValues)
-
-
+    console.log('filtersValues: ', filtersValues)
 }
 
-function updateUrlFilters(viewNumber){
+function updateUrlFilters(viewNumber) {
 
     console.log('updating URL params')
     const paramsKey = 'cal' + viewNumber
@@ -116,47 +109,40 @@ function updateUrlFilters(viewNumber){
     });
 
     window.history.pushState({}, '', url.toString());
-
 }
 
-function getFilterValue(filter, viewNr){
-
+function getFilterValue(filter, viewNr) {
     let filterId = filter.toString() + '-input-' + viewNr.toString()
     const filterInputElement = document.getElementById(filterId)
     return filterInputElement.value
-
 }
 
-function setFilterValue(filter, viewNr, value){
-
+function setFilterValue(filter, viewNr, value) {
     let filterId = filter.toString() + '-input-' + viewNr
     const filterInputElement = document.getElementById(filterId)
     filterInputElement.value = value
-
 }
 
 
-function handleFiltering(event){
-
+function handleFiltering(event) {
     const targetButton = event.target
     const [filter, button, viewNumber] = targetButton.id.split('-')
     console.log(viewNumber)
 
     updateUrlFilters(viewNumber)
 
-
-    inputDataIntoView(viewNumber, [getFilterValue('wykladowca',viewNumber),
-                                            getFilterValue('sala',viewNumber),
-                                            getFilterValue('przedmiot',viewNumber),
-                                            getFilterValue('grupa',viewNumber),
-                                            getFilterValue('album',viewNumber)] )
-
-
-
+    inputDataIntoView(viewNumber, [
+            getFilterValue('wykladowca', viewNumber),
+            getFilterValue('sala', viewNumber),
+            getFilterValue('przedmiot', viewNumber),
+            getFilterValue('grupa', viewNumber),
+            getFilterValue('album', viewNumber)
+        ]
+    )
 }
 
 
-function parseUrlParams(urlParams){
+function parseUrlParams(urlParams) {
 
     const parsedParams = {};
 
@@ -184,48 +170,43 @@ function parseUrlParams(urlParams){
 
     globalParsedParams = parsedParams
 
-    for( let view in parsedParams)
-    {
+    for (let view in parsedParams) {
         let filtersDict = parsedParams[view]
 
-        for( let filter in filtersDict)
-        {
-            if(filter === 'nr'){
+        for (let filter in filtersDict) {
+            if (filter === 'nr') {
                 createNewCalendarView(filtersDict['nr'])
-            }else{
-                if(filtersDict[filter] !== null){
+            } else {
+                if (filtersDict[filter] !== null) {
                     setFilterValue(filter.toString(), filtersDict['nr'], filtersDict[filter])
                 }
             }
         }
 
-        if (Object.values(filtersDict).filter(value => value !== null).length > 1 ) {
-            inputDataIntoView(filtersDict['nr'], [filtersDict['wykladowca'],
-                                                        filtersDict['sala'],
-                                                        filtersDict['przedmiot'],
-                                                        filtersDict['grupa']],
-                                                        filtersDict['album'])
+        if (Object.values(filtersDict).filter(value => value !== null).length > 1) {
+            inputDataIntoView(filtersDict['nr'], [
+                filtersDict['wykladowca'],
+                filtersDict['sala'],
+                filtersDict['przedmiot'],
+                filtersDict['grupa'],
+                filtersDict['album']],
+            )
         }
-
     }
-
     //TODO: dodac maly spinner przy ladowaniu danych
-
 }
 
-function inputDataIntoView(view, filters){
+function inputDataIntoView(view, filters) {
 
     console.log('adding data to target calendar')
     const calDiv = document.getElementById('cal-' + view)
     //getting calendar to input events
     const targetCalendar = globalCalendarsArray['cal-' + view]
-    const data = fetchFilteredData()
+    const data = fetchFilteredData(filters)
     console.log('data ktora dostalem', data)
-    for(let id in data) {
+    for (let id in data) {
 
         targetCalendar.addEvent(data[id])
         targetCalendar.render()
     }
-
-
 }
