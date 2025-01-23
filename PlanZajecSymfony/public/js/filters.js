@@ -132,11 +132,6 @@ function setFilterValue(filter, viewNr, value){
 
 }
 
-function fetchFilteredData(){
-
-    console.log('getting data')
-
-}
 
 function handleFiltering(event){
 
@@ -145,6 +140,8 @@ function handleFiltering(event){
     console.log(viewNumber)
 
     updateUrlFilters(viewNumber)
+
+    //TODO: add proper filters data after API is created
     fetchFilteredData()
 
 
@@ -179,9 +176,9 @@ function parseUrlParams(urlParams){
 
     globalParsedParams = parsedParams
 
-    for( let key in parsedParams)
+    for( let view in parsedParams)
     {
-        let filtersDict = parsedParams[key]
+        let filtersDict = parsedParams[view]
 
         for( let filter in filtersDict)
         {
@@ -193,10 +190,33 @@ function parseUrlParams(urlParams){
                 }
             }
         }
+
+        if (Object.values(filtersDict).filter(value => value !== null).length > 1 ) {
+            inputDataIntoView(filtersDict['nr'], [filtersDict['wykladowca'],
+                                                        filtersDict['sala'],
+                                                        filtersDict['przedmiot'],
+                                                        filtersDict['grupa']],
+                                                        filtersDict['album'])
+        }
+
     }
 
     //TODO: dodac maly spinner przy ladowaniu danych
 
+}
+
+function inputDataIntoView(view, filters){
+
+    console.log('adding data to target calendar')
+    const calDiv = document.getElementById('cal-' + view)
+    const targetCalendar = globalCalendarsArray['cal-' + view]
+    const data = fetchFilteredData()
+    console.log('data ktora dostalem', data)
+    for(let id in data) {
+
+        targetCalendar.addEvent(data[id])
+        targetCalendar.render()
+    }
 
 
 }

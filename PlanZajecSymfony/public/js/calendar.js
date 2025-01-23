@@ -1,5 +1,5 @@
-
 let globalParsedParams = {}
+let globalCalendarsArray = {}
 
 document.addEventListener('DOMContentLoaded', () => {
     const addButton = document.getElementById('add-button');
