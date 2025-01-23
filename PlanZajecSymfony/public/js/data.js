@@ -15,7 +15,10 @@ function fetchFilteredData(filters) {
         Group: filters[3],
         Student: filters[4]
     }
-    const data = fetchRecordsFromAPI(namedFilters)
+    const data = []
+    fetchRecordsFromAPI(namedFilters).then((data) => {
+        this.data = data
+    })
     return parseDataIntoEvents(data)
 }
 
@@ -152,7 +155,7 @@ async function fetchRecordsFromAPI(filters) {
     let slug = lessonSlug(filters)
     try {
         const response = await fetch(Endpoints.Lessons + '?' + slug)
-        return await response.json()
+        return await response.json();
     } catch (error) {
         console.log('Failed to fetch data from API.' + error.message)
         return []
