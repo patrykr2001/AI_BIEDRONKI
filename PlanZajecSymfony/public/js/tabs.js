@@ -1,13 +1,36 @@
 
 function renderNewCalendar(calendarDivId){
 
+
     const calendarEl = document.getElementById(calendarDivId);
 
     const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth'
+        headerToolbar:{
+            start: 'listDay,dayGridWeek,dayGridMonth',
+            center: 'title',
+            end: 'prev,today,next'
+        },
+        buttonText:{
+            today: 'dziś',
+            listDay: 'dzień',
+            dayGridWeek: 'tydzień',
+            dayGridMonth: 'miesiąc'
+
+        },
+        initialView: 'dayGridMonth',
+        events: [
+            {
+                id: 'a',
+                title: 'my event',
+                start: '2025-01-23'
+            }
+        ]
     });
 
     calendar.render();
+
+    globalCalendarsArray[calendarDivId] = calendar
+
 
 
 }

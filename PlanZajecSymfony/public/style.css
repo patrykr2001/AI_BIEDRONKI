@@ -1,17 +1,45 @@
 body{
 
-    background-color: darkgrey;
+    background-color: #d9d6d6;
 
 }
+
+#view{
+
+    padding: 10%
+
+}
+
 /*TODO ogarnar te radoisy dp procentow*/
-.calendar-tab, .add-tab{
+.calendar-tab{
 
     border-style: solid;
+    border-width: thin;
     border-color: black;
     border-radius: 5% 60% 10% 1%;
     min-width: 5%;
     text-align: center;
+    padding: 0;
 
+}
+
+#tabs-bar{
+
+    position:relative;;
+    left: 25%;
+    width: 75%;
+    margin: 0;
+    padding: 0;
+
+}
+
+#slides_wrapper{
+    background-color: white;
+    padding: 0;
+}
+
+#calendar-gallery{
+    padding: 0;
 }
 
 .filters-button{
@@ -23,12 +51,21 @@ body{
 
 .calendar-slide, .filters-container{
 
-    padding: 0 10%;
-    border-style: solid;
+    padding: 0 10% 20% 10%;
     min-height: 100%;
-    background: white;
     grid-area: overlap;
 
+}
+
+.filters-container{
+    border-style: solid;
+    padding-top: 1%;
+}
+
+.calendar-slide{
+
+    background-color: white;
+    padding-top: 1%;
 }
 
 #slides_wrapper, #filters-wrapper{
@@ -37,7 +74,7 @@ body{
     grid-template-columns: 1fr;
     grid-template-rows: 1fr;
     grid-template-areas: "overlap";
-    border-style: solid;
+
 
 }
 
