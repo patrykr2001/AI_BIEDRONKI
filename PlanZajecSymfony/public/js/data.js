@@ -19,7 +19,7 @@ function parseDataIntoEvents(fetchedRecords) {
             sala: '123',
             przedmiot: 'Aplikacje internetowe 1',
             budynek: 'WI1',
-            start: '2025-01-23',
+            start: '2025-01-23T14:30',
             hours: 2
         },{
             id: 'nie',
@@ -27,7 +27,7 @@ function parseDataIntoEvents(fetchedRecords) {
             sala: '245',
             przedmiot: 'Programownia komputerow 1',
             budynek: 'WI2',
-            start: '2025-01-22',
+            start: '2025-01-22T14:30',
             hours: 2
         },
         {
@@ -36,7 +36,7 @@ function parseDataIntoEvents(fetchedRecords) {
             sala: '12',
             przedmiot: 'Transmisja danych',
             budynek: 'WI1',
-            start: '2025-01-24',
+            start: '2025-01-24T14:30',
             hours: 2
         }
 
@@ -61,9 +61,8 @@ function parseDataIntoEvents(fetchedRecords) {
 function recordToEvent(record) {
 
     let event = {
-        id: record['id'],
+        // id: record['id'],
         title: record['wykladowca'] + ' ' + record['przedmiot'],
-        allDay: true,
         start: record['start']
 
     }
