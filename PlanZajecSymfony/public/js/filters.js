@@ -36,7 +36,10 @@ function insertNewFiltersContainer(viewNumber){
     parentElement.insertAdjacentHTML('beforeend', containerHTML);
 
     const filterButton = document.getElementById('filter-button-' + viewNumber)
+
     filterButton.addEventListener('click', handleFiltering)
+
+    //TODO: dodac czyszcenie filtrow
 
 
 
@@ -141,8 +144,13 @@ function handleFiltering(event){
 
     updateUrlFilters(viewNumber)
 
-    //TODO: add proper filters data after API is created
-    fetchFilteredData()
+
+    inputDataIntoView(viewNumber, [getFilterValue('wykladowca',viewNumber),
+                                            getFilterValue('sala',viewNumber),
+                                            getFilterValue('przedmiot',viewNumber),
+                                            getFilterValue('grupa',viewNumber),
+                                            getFilterValue('album',viewNumber)] )
+
 
 
 }
@@ -209,6 +217,7 @@ function inputDataIntoView(view, filters){
 
     console.log('adding data to target calendar')
     const calDiv = document.getElementById('cal-' + view)
+    //getting calendar to input events
     const targetCalendar = globalCalendarsArray['cal-' + view]
     const data = fetchFilteredData()
     console.log('data ktora dostalem', data)
