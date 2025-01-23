@@ -154,7 +154,7 @@ async function fetchRecordsFromAPI(filters) {
         const response = await fetch(Endpoints.Lessons + '?' + slug)
         return await response.json()
     } catch (error) {
-        console.error(error.message)
+        console.log('Failed to fetch data from API.' + error.message)
         return []
     }
 }
