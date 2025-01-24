@@ -55,6 +55,16 @@ class RoomRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    public function findRoomByNameGetId(string $name): ?Room
+    {
+        return $this->createQueryBuilder('r')
+            ->select('r.id')
+            ->andWhere('r.name = :name')
+            ->setParameter('name', $name)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     /**
      * Saves a Room entity
      */

@@ -43,12 +43,24 @@ class SubjectRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+
+
     /**
      * @return Subject|null Returns a Subject object or null
      */
     public function findSubjectByName(string $name): ?Subject
     {
         return $this->createQueryBuilder('s')
+            ->andWhere('s.name = :name')
+            ->setParameter('name', $name)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function findSubjectByNameGetID(string $name): ?Subject
+    {
+        return $this->createQueryBuilder('s')
+            ->select('s.id')
             ->andWhere('s.name = :name')
             ->setParameter('name', $name)
             ->getQuery()

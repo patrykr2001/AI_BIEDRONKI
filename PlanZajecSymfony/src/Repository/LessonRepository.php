@@ -91,11 +91,12 @@ class LessonRepository extends ServiceEntityRepository
      * @param Teacher $teacher
      * @param Subject $subject
      * @param Group $group
+     * @param Room $room
      * @param DateTime $start
      * @param DateTime $end
      * @return Lesson|null
      */
-    public function findLessonAPI(Teacher  $teacher, Subject $subject, Group $group, DateTime $start, DateTime $end): ?Lesson
+    public function findLessonAPI(Teacher  $teacher, Subject $subject, Group $group,Room $room, DateTime $start, DateTime $end): ?Lesson
     {
         $q =  $this -> createQueryBuilder('l');
 
@@ -111,6 +112,10 @@ class LessonRepository extends ServiceEntityRepository
             {
                 $q  ->andWhere('l.groupId IN :group');
             }
+        if($room!="")
+        {
+            $q  ->andWhere('l.roomId IN :room');
+        }
 
 
         $q  ->andWhere('l.startDate >= :start');
@@ -119,6 +124,7 @@ class LessonRepository extends ServiceEntityRepository
            $q->setParameter('teacher', $teacher)
             ->setParameter('subject', $subject)
             ->setParameter('group', $group)
+            ->setParameter('room', $room)
             ->setParameter('start', $start)
             ->setParameter('end', $end)
             ->getQuery()

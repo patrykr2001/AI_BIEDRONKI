@@ -55,6 +55,16 @@ class TeacherRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    public function findTeacherByNameGetId(string $name): ?Teacher
+    {
+        return $this->createQueryBuilder('t')
+            ->select('t.id')
+            ->andWhere('t.name = :name')
+            ->setParameter('name', $name)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     /**
      * Saves a Teacher entity
      */

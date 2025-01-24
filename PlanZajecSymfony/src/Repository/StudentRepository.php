@@ -39,6 +39,17 @@ class StudentRepository extends ServiceEntityRepository
         return $this->findOneBy(['number' => $number]);
     }
 
+
+    public function findGroupIB(string $name): ?Student
+    {
+        return $this->createQueryBuilder('s')
+            ->select('s.groupId')
+            ->andWhere('s.name = :name')
+            ->setParameter('name', $name)
+            ->getQuery()
+            ->getResults();
+    }
+
     /**
      * @param Student $student
      * @return void
