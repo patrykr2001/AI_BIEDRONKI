@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Group;
 use App\Entity\Lesson;
+use App\Entity\Room;
 use App\Entity\Subject;
 use App\Entity\Teacher;
 use DateTime;
@@ -20,7 +21,8 @@ class LessonRepository extends ServiceEntityRepository
         parent::__construct($registry, Lesson::class);
     }
 
-    public function clearCache(): void{
+    public function clearCache(): void
+    {
         $_em = $this->getEntityManager();
         $_em->clear();
     }
@@ -96,32 +98,28 @@ class LessonRepository extends ServiceEntityRepository
      * @param DateTime $end
      * @return Lesson|null
      */
-    public function findLessonAPI(Teacher  $teacher, Subject $subject, Group $group,Room $room, DateTime $start, DateTime $end): ?Lesson
+    public function findLessonAPI(Teacher $teacher, Subject $subject, Group $group, Room $room, DateTime $start, DateTime $end): ?Lesson
     {
-        $q =  $this -> createQueryBuilder('l');
+        $q = $this->createQueryBuilder('l');
 
-        if($teacher!="")
-            {
-                $q  ->andWhere('l.workerId = :teacher');
-            }
-        if($subject!="")
-            {
-                $q  ->andWhere('l.subjectId = :subject');
-            }
-        if($group!="")
-            {
-                $q  ->andWhere('l.groupId IN :group');
-            }
-        if($room!="")
-        {
-            $q  ->andWhere('l.roomId IN :room');
+        if ($teacher != "") {
+            $q->andWhere('l.workerId = :teacher');
+        }
+        if ($subject != "") {
+            $q->andWhere('l.subjectId = :subject');
+        }
+        if ($group != "") {
+            $q->andWhere('l.groupId IN :group');
+        }
+        if ($room != "") {
+            $q->andWhere('l.roomId IN :room');
         }
 
 
-        $q  ->andWhere('l.startDate >= :start');
-        $q  ->andWhere('l.endDate <= :end');
+        $q->andWhere('l.startDate >= :start');
+        $q->andWhere('l.endDate <= :end');
 
-           $q->setParameter('teacher', $teacher)
+        $q->setParameter('teacher', $teacher)
             ->setParameter('subject', $subject)
             ->setParameter('group', $group)
             ->setParameter('room', $room)
