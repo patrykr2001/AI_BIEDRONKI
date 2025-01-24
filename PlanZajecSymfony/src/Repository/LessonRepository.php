@@ -109,16 +109,16 @@ class LessonRepository extends ServiceEntityRepository
             }
         if($group!="")
             {
-                $q  ->andWhere('l.groupId = :group');
+                $q  ->andWhere('l.groupId IN :group');
             }
 
 
         $q  ->andWhere('l.startDate >= :start');
         $q  ->andWhere('l.endDate <= :end');
 
-           $q->setParameter('teacher', "%".$teacher."%")
-            ->setParameter('subject', "%".$subject."%")
-            ->setParameter('group', "%".$group."%")
+           $q->setParameter('teacher', $teacher)
+            ->setParameter('subject', $subject)
+            ->setParameter('group', $group)
             ->setParameter('start', $start)
             ->setParameter('end', $end)
             ->getQuery()
