@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Controller;
+use App\Repository\RoomRepository;
 
 use PHPUnit\Util\Json;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,15 +20,15 @@ class ApiRoomController extends AbstractController
             return new JsonResponse([], Response::HTTP_OK);
         }
 
-        $data = [
-            ['id' => 1, 'name' => 'Room 1'],
-            ['id' => 2, 'name' => 'Room 2'],
-            ['id' => 3, 'name' => 'Room 3'],
-        ];
+        $c = new RoomRepository();
+
+        $data = $c->findRoomByName($name);
+
+        $data=json_encode($data);
 
         // Filter data based on whether the name contains the provided string
-        $filteredData = array_filter($data, fn($room) => stripos($room['name'], $name) !== false);
+        //$filteredData = array_filter($data, fn($room) => stripos($room['name'], $name) !== false);
 
-        return new JsonResponse($filteredData, Response::HTTP_OK);
+        return new JsonResponse($data, Response::HTTP_OK);
     }
 }

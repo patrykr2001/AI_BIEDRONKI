@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 namespace App\Controller;
+use App\Repository\TeacherRepository;
+
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,15 +20,15 @@ class ApiTeacherController extends AbstractController
             return new JsonResponse([], Response::HTTP_OK);
         }
 
-        $data = [
-            ['id' => 1, 'name' => 'Teacher 1'],
-            ['id' => 2, 'name' => 'Teacher 2'],
-            ['id' => 3, 'name' => 'Teacher 3'],
-        ];
+        $c = new TeacherRepository();
+
+        $data = $c->findTeacherByName($name);
+
+        $data=json_encode($data);
 
         // Filter data based on whether the name contains the provided string
-        $filteredData = array_filter($data, fn($teacher) => stripos($teacher['name'], $name) !== false);
+        //$filteredData = array_filter($data, fn($teacher) => stripos($teacher['name'], $name) !== false);
 
-        return new JsonResponse($filteredData, Response::HTTP_OK);
+        return new JsonResponse($data, Response::HTTP_OK);
     }
 }

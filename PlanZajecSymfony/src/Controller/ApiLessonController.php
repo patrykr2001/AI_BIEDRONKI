@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Controller;
-
+use App\Repository\LessonRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,14 +12,15 @@ use Symfony\Component\Routing\Attribute\Route;
 class ApiLessonController extends AbstractController
 {
     #[Route('/api/lessons', methods: ['GET'])]
-    public function getApiLessons(): JsonResponse
+    public function getApiLessons(string $teacher , string $subject , string $group , string $name ): JsonResponse
     {
-        $data = [
-            ['id' => 1, 'name' => 'Lessons 1'],
-            ['id' => 2, 'name' => 'Lessons 2'],
-            ['id' => 3, 'name' => 'Lessons 3'],
-        ];
+
+        $c = new LessonRepository();
+
+        $data = $c->findAllLessons($name);
 
         return new JsonResponse($data, Response::HTTP_OK);
     }
+
+
 }
