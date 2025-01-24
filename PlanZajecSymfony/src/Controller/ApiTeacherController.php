@@ -13,6 +13,12 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class ApiTeacherController extends AbstractController
 {
+    private TeacherRepository $teacherRepository;
+
+    public function __construct(TeacherRepository $teacherRepository)
+    {
+        $this->teacherRepository = $teacherRepository;
+    }
     #[Route('/api/teachers/{name}', methods: ['GET'])]
     public function getApiTeachers(string $name): JsonResponse
     {
@@ -20,9 +26,10 @@ class ApiTeacherController extends AbstractController
             return new JsonResponse([], Response::HTTP_OK);
         }
 
-        $c = new TeacherRepository();
+        $S_name= "%".$name;
+        $S_name= $name."%";
 
-        $data = $c->findTeacherByName($name);
+        $data =  $this->teacherRepository->findTeacherByName($S_name);
 
         $data=json_encode($data);
 

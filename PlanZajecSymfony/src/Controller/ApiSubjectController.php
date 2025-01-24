@@ -12,6 +12,12 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class ApiSubjectController extends AbstractController
 {
+    private SubjectRepository $subjectRepository;
+
+    public function __construct(SubjectRepository $subjectRepository)
+    {
+        $this->subjectRepository = $subjectRepository;
+    }
     #[Route('/api/subjects/{name}', methods: ['GET'])]
     public function getApiSubjects(string $name): JsonResponse
     {
@@ -19,9 +25,10 @@ class ApiSubjectController extends AbstractController
             return new JsonResponse([], Response::HTTP_OK);
         }
 
-        $c = new SubjectRepository();
+        $S_name= "%".$name;
+        $S_name= $name."%";
 
-        $data = $c->findSubjectByName($name);
+        $data =  $this->subjectRepository->findSubjectByName($S_name);
 
         $data=json_encode($data);
         // Filter data based on whether the name contains the provided string

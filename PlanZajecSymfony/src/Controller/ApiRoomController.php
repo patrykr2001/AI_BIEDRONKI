@@ -13,6 +13,12 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class ApiRoomController extends AbstractController
 {
+    private RoomRepository $roomRepository;
+
+    public function __construct(RoomRepository $roomRepository)
+    {
+        $this->roomRepository = $roomRepository;
+    }
     #[Route('/api/rooms/{name}', methods: ['GET'])]
     public function getApiRooms(string $name): JsonResponse
     {
@@ -20,9 +26,10 @@ class ApiRoomController extends AbstractController
             return new JsonResponse([], Response::HTTP_OK);
         }
 
-        $c = new RoomRepository();
+        $S_name= "%".$name;
+        $S_name= $name."%";
 
-        $data = $c->findRoomByName($name);
+        $data =  $this->roomRepository->findRoomByName($S_name);
 
         $data=json_encode($data);
 
