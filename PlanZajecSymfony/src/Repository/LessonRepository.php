@@ -87,6 +87,46 @@ class LessonRepository extends ServiceEntityRepository
     }
 
     /**
+     * Finds a Lesson entity by its teacher ID, subject ID, group ID, start date and end date.
+     * @param Teacher $teacher
+     * @param Subject $subject
+     * @param Group $group
+     * @param DateTime $start
+     * @param DateTime $end
+     * @return Lesson|null
+     */
+    public function findLessonAPI(Teacher  $teacher, Subject $subject, Group $group, DateTime $start, DateTime $end): ?Lesson
+    {
+        $q =  $this -> createQueryBuilder('l');
+
+        if($teacher!="")
+            {
+                $q  ->andWhere('l.workerId = :teacher');
+            }
+        if($subject!="")
+            {
+                $q  ->andWhere('l.subjectId = :subject');
+            }
+        if($group!="")
+            {
+                $q  ->andWhere('l.groupId = :group');
+            }
+
+
+        $q  ->andWhere('l.startDate >= :start');
+        $q  ->andWhere('l.endDate <= :end');
+
+           $q->setParameter('teacher', "%".$teacher."%")
+            ->setParameter('subject', "%".$subject."%")
+            ->setParameter('group', "%".$group."%")
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->getQuery()
+            ->getOneOrNullResult();
+        return $q;
+    }
+
+    /**
      * Finds all Lesson entities.
      *
      * @return Lesson[]
