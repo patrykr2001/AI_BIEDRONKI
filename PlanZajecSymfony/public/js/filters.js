@@ -230,10 +230,10 @@ function parseUrlParams(urlParams) {
             )
         }
     }
-    //TODO: dodac maly spinner przy ladowaniu danych
 }
 
 function inputDataIntoView(view, filters) {
+    toggleSpinner()
     fetchFilteredData(filters, inputData, view)
 }
 
@@ -249,6 +249,7 @@ function inputData(data, view) {
         targetCalendar.addEvent(data[id])
         targetCalendar.render()
     }
+    toggleSpinner()
 }
 
 function handleFiltersClearing(event) {

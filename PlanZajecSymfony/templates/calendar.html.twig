@@ -1,82 +1,90 @@
 {% block javascripts %}
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+            crossorigin="anonymous"></script>
 
 {% endblock %}
 
-{%  block stylesheet %}
+{% block stylesheet %}
     <link rel="stylesheet" type="text/css" href="{{ asset('style.css') }}"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 {% endblock %}
 
 <body>
 
-    <div class="container-fluid" id="view">
-        <div id="spinner-overlay" class="justify-content-center text-center">
-            <div class="spinner-border" style="top: 50%; position: relative; width: 10rem; height: 10rem;"></div>
-        </div>
-            <div class="container pa d-flex flex-row" id="tabs-bar">
-                <div class="box box-add calendar-tab"
-                     id="add-button">+
-                </div>
-        </div>
-
-        <div class="d-flex container-fluid h-75 flex-row" id="calendar-gallery">
-
-            <div class="container w-25" id="filters-wrapper">
-                <div class="container filters-container" id="filters-1">
-                    <p class="text-start mb-1">Wykładowca</p>
-                    <div class="input-group mb-1">
-                        <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" id="wykladowca-input-1">
-                    </div>
-                    <p class="text-start mb-1">Sala</p>
-                    <div class="input-group mb-1">
-                        <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" id="sala-input-1">
-                    </div>
-                    <p class="text-start mb-1">Przedmiot</p>
-                    <div class="input-group mb-1">
-                        <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" id="przedmiot-input-1">
-                    </div>
-                    <p class="text-start mb-1">Grupa</p>
-                    <div class="input-group mb-1">
-                        <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" id="grupa-input-1">
-                    </div>
-                    <p class="text-start mb-1">Numer albumu</p>
-                    <div class="input-group mb-1">
-                        <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" id="album-input-1">
-                    </div>
-                    <p class="text-start mb-1">Od</p>
-                    <div class="input-group mb-1">
-                        <input type="date" class="form-control" id="start-input-1">
-                    </div>
-                    <p class="text-start mb-1">Do</p>
-                    <div class="input-group mb-1">
-                        <input type="date" class="form-control" id="end-input-1">
-                    </div>
-                    <div class="text-center">
-                        <button class="btn btn-primary" id="filter-button-1">Wyszukaj</button>
-                        <button class="btn btn-light" id="clean-filters-button-1">Wyczyść filtry</button>
-                    </div>
-                </div>
-            </div>
-            <div class="container-fluid w-75" id="slides_wrapper">
-                <div class="container calendar-slide" id="calendar-1">
-                </div>
-            </div>
+<div class="container-fluid" id="view">
+    <div id="spinner-overlay" class="justify-content-center text-center" style="display: none">
+        <div class="spinner-border" style="top: 50%; position: relative; width: 10rem; height: 10rem;"></div>
+    </div>
+    <div class="container pa d-flex flex-row" id="tabs-bar">
+        <div class="box box-add calendar-tab"
+             id="add-button">+
         </div>
     </div>
 
-    <script>
-        const urlParams = {{ queryParameters|json_encode()|raw }};
-        console.log('URL Parameters:', urlParams);
-    </script>
-    <script src="../{{ asset('js/calendar.js') }}"></script>
-    <script src="../{{ asset('js/tabs.js') }}"></script>
-    <script src="../{{ asset('js/filters.js') }}"></script>
-    <script src="../{{ asset('js/data.js') }}"></script>
-    <script src="../{{ asset('js/utils.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <div class="d-flex container-fluid h-75 flex-row" id="calendar-gallery">
+
+        <div class="container w-25" id="filters-wrapper">
+            <div class="container filters-container" id="filters-1">
+                <p class="text-start mb-1">Wykładowca</p>
+                <div class="input-group mb-1">
+                    <input type="text" class="form-control" aria-label="Sizing example input"
+                           aria-describedby="inputGroup-sizing-default" id="wykladowca-input-1">
+                </div>
+                <p class="text-start mb-1">Sala</p>
+                <div class="input-group mb-1">
+                    <input type="text" class="form-control" aria-label="Sizing example input"
+                           aria-describedby="inputGroup-sizing-default" id="sala-input-1">
+                </div>
+                <p class="text-start mb-1">Przedmiot</p>
+                <div class="input-group mb-1">
+                    <input type="text" class="form-control" aria-label="Sizing example input"
+                           aria-describedby="inputGroup-sizing-default" id="przedmiot-input-1">
+                </div>
+                <p class="text-start mb-1">Grupa</p>
+                <div class="input-group mb-1">
+                    <input type="text" class="form-control" aria-label="Sizing example input"
+                           aria-describedby="inputGroup-sizing-default" id="grupa-input-1">
+                </div>
+                <p class="text-start mb-1">Numer albumu</p>
+                <div class="input-group mb-1">
+                    <input type="text" class="form-control" aria-label="Sizing example input"
+                           aria-describedby="inputGroup-sizing-default" id="album-input-1">
+                </div>
+                <p class="text-start mb-1">Od</p>
+                <div class="input-group mb-1">
+                    <input type="date" class="form-control" id="start-input-1">
+                </div>
+                <p class="text-start mb-1">Do</p>
+                <div class="input-group mb-1">
+                    <input type="date" class="form-control" id="end-input-1">
+                </div>
+                <div class="text-center">
+                    <button class="btn btn-primary" id="filter-button-1">Wyszukaj</button>
+                    <button class="btn btn-light" id="clean-filters-button-1">Wyczyść filtry</button>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid w-75" id="slides_wrapper">
+            <div class="container calendar-slide" id="calendar-1">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const urlParams = {{ queryParameters|json_encode()|raw }};
+    console.log('URL Parameters:', urlParams);
+</script>
+<script src="../{{ asset('js/calendar.js') }}"></script>
+<script src="../{{ asset('js/tabs.js') }}"></script>
+<script src="../{{ asset('js/filters.js') }}"></script>
+<script src="../{{ asset('js/data.js') }}"></script>
+<script src="../{{ asset('js/utils.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </body>
 
 
