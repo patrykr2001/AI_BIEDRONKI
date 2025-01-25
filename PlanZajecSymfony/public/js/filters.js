@@ -24,6 +24,12 @@ function insertNewFiltersContainer(viewNumber) {
             <div class="input-group mb-1">
                 <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" id="album-input-${viewNumber}">
             </div>
+            <div class="input-group mb-1">
+                 <input type="date" id="start-input-${viewNumber}">
+            </div>
+            <div class="input-group mb-1">
+                 <input type="date" id="end-input-${viewNumber}">
+            </div>
             <div class="text-center">
                 <button class="btn btn-primary" id="filter-button-${viewNumber}">Wyszukaj</button>
                 <button class="btn btn-light" id="clean-filters-button-${viewNumber}">Wyczyść filtry</button>
@@ -38,6 +44,20 @@ function insertNewFiltersContainer(viewNumber) {
 
     filterButton.addEventListener('click', handleFiltering)
 
+    console.log('view', viewNumber)
+
+    flatpickr(`#start-input-${viewNumber}`,
+        {
+            dateFormat: "d-m-Y"
+        }
+            );
+
+    flatpickr(`#end-input-${viewNumber}`,
+        {
+            dateFormat: "d-m-Y"
+        }
+    );
+
     //TODO: dodac czyszcenie filtrów
 }
 
@@ -49,6 +69,8 @@ function saveInitialFilters(viewNumber, filtersValues) {
     const przedmiotInputValue = getFilterValue('przedmiot', viewNumber)
     const grupaInputValue = getFilterValue('grupa', viewNumber)
     const albumInputValue = getFilterValue('album', viewNumber)
+    const startInputValue = getFilterValue('start', viewNumber)
+    const endInputValue = getFilterValue('end', viewNumber)
 
     filtersValues = {
         "nr": viewNumber.toString(),
@@ -56,7 +78,9 @@ function saveInitialFilters(viewNumber, filtersValues) {
         "sala": salaInputValue,
         "przedmiot": przedmiotInputValue,
         "grupa": grupaInputValue,
-        "album": albumInputValue
+        "album": albumInputValue,
+        "start": startInputValue,
+        "end" : endInputValue
     }
 
     console.log('filtersValues: ', filtersValues)
@@ -72,7 +96,9 @@ function updateUrlFilters(viewNumber) {
         sala: getFilterValue('sala', viewNumber),
         przedmiot: getFilterValue('przedmiot', viewNumber),
         grupa: getFilterValue('grupa', viewNumber),
-        album: getFilterValue('album', viewNumber)
+        album: getFilterValue('album', viewNumber),
+        start: getFilterValue('start', viewNumber),
+        end: getFilterValue('end', viewNumber)
     }
 
     //TODO: dodac obsluge kiedy WSZYSTKIE filtry sa puste
@@ -136,7 +162,9 @@ function handleFiltering(event) {
             getFilterValue('sala', viewNumber),
             getFilterValue('przedmiot', viewNumber),
             getFilterValue('grupa', viewNumber),
-            getFilterValue('album', viewNumber)
+            getFilterValue('album', viewNumber),
+            getFilterValue('start', viewNumber),
+            getFilterValue('end', viewNumber)
         ]
     )
 }
@@ -146,7 +174,7 @@ function parseUrlParams(urlParams) {
 
     const parsedParams = {};
 
-    const attributes = ['wykladowca', 'sala', 'przedmiot', 'grupa', 'album'];
+    const attributes = ['wykladowca', 'sala', 'przedmiot', 'grupa', 'album', 'start', 'end'];
 
     for (const [key, value] of Object.entries(urlParams)) {
         const [prefix, attribute] = key.split('_');
@@ -161,7 +189,9 @@ function parseUrlParams(urlParams) {
                     sala: null,
                     przedmiot: null,
                     grupa: null,
-                    album: null
+                    album: null,
+                    start: null,
+                    end: null
                 };
             }
             parsedParams[prefix][attribute] = value;
@@ -189,7 +219,9 @@ function parseUrlParams(urlParams) {
                 filtersDict['sala'],
                 filtersDict['przedmiot'],
                 filtersDict['grupa'],
-                filtersDict['album']],
+                filtersDict['album'],
+                filtersDict['start'],
+                filtersDict['end']],
             )
         }
     }
