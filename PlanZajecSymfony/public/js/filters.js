@@ -160,11 +160,9 @@ function handleFiltering(event) {
     const [filter, button, viewNumber] = targetButton.id.split('-')
     console.log(viewNumber)
 
-    const cal = globalCalendarsArray['cal-' + viewNumber]
-    const eventsArray = cal.getEvents()
-    for(let event in eventsArray) {
-        event.remove()
-    }
+    delete globalCalendarsArray['cal-' + viewNumber]
+
+    renderNewCalendar('cal-' + viewNumber)
 
     updateUrlFilters(viewNumber)
 
