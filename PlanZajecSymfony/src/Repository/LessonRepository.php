@@ -4,7 +4,6 @@ namespace App\Repository;
 
 use App\Entity\Group;
 use App\Entity\Lesson;
-use App\Entity\Room;
 use App\Entity\Subject;
 use App\Entity\Teacher;
 use DateTime;
@@ -90,44 +89,44 @@ class LessonRepository extends ServiceEntityRepository
 
     /**
      * Finds a Lesson entity by its teacher ID, subject ID, group ID, start date and end date.
-     * @param Teacher $teacher
-     * @param Subject $subject
-     * @param Group $group
-     * @param Room $room
+     * @param string $teacher
+     * @param string $subject
+     * @param array $group
+     * @param string $room
      * @param DateTime $start
      * @param DateTime $end
-     * @return Lesson|null
+     * @return array
      */
-    public function findLessonAPI(Teacher $teacher, Subject $subject, Group $group, Room $room, DateTime $start, DateTime $end): ?Lesson
+    public function findLessonAPI(string   $teacher, string $subject, array $group, string $room, DateTime $start,
+                                  DateTime $end): array
     {
         $q = $this->createQueryBuilder('l');
 
         if ($teacher != "") {
-            $q->andWhere('l.workerId = :teacher');
+            $q->andWhere('l.workerId = :teacher')
+                ->setParameter('teacher', $teacher);
         }
         if ($subject != "") {
-            $q->andWhere('l.subjectId = :subject');
+            $q->andWhere('l.subjectId = :subject')
+                ->setParameter('subject', $subject);
         }
-        if ($group != "") {
-            $q->andWhere('l.groupId IN :group');
+        if ($group != "" && count($group) > 0) {
+            $q->andWhere('l.groupId IN :group')
+                ->setParameter('group', $group);
         }
         if ($room != "") {
-            $q->andWhere('l.roomId IN :room');
+            $q->andWhere('l.roomId IN :room')
+                ->setParameter('room', $room);
         }
 
+        $q->andWhere('l.startDate >= :start')
+            ->setParameter('start', $start);
+        $q->andWhere('l.endDate <= :end')
+            ->setParameter('end', $end);
 
-        $q->andWhere('l.startDate >= :start');
-        $q->andWhere('l.endDate <= :end');
+        $query = $q->getQuery();
 
-        $q->setParameter('teacher', $teacher)
-            ->setParameter('subject', $subject)
-            ->setParameter('group', $group)
-            ->setParameter('room', $room)
-            ->setParameter('start', $start)
-            ->setParameter('end', $end)
-            ->getQuery()
-            ->getOneOrNullResult();
-        return $q;
+        return $query->getResult();
     }
 
     /**

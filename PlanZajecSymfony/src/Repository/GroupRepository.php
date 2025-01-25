@@ -50,14 +50,14 @@ class GroupRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
-    public function findGroupByNameGetId(string $name): ?Group
+    public function findGroupByNameGetId(string $name): ?string
     {
         return $this->createQueryBuilder('r')
             ->select('r.id')
             ->andWhere('r.name = :name')
             ->setParameter('name', $name)
             ->getQuery()
-            ->getOneOrNullResult();
+            ->getOneOrNullResult()->getId();
     }
 
     /**

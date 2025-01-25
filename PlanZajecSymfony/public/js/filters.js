@@ -55,7 +55,7 @@ function insertNewFiltersContainer(viewNumber) {
         {
             dateFormat: "d-m-Y"
         }
-            );
+    );
 
     flatpickr(`#end-input-${viewNumber}`,
         {
@@ -85,7 +85,7 @@ function saveInitialFilters(viewNumber, filtersValues) {
         "grupa": grupaInputValue,
         "album": albumInputValue,
         "start": startInputValue,
-        "end" : endInputValue
+        "end": endInputValue
     }
 
     console.log('filtersValues: ', filtersValues)
@@ -234,12 +234,15 @@ function parseUrlParams(urlParams) {
 }
 
 function inputDataIntoView(view, filters) {
+    fetchFilteredData(filters, inputData, view)
+}
 
+function inputData(data, view) {
     console.log('adding data to target calendar')
     const calDiv = document.getElementById('cal-' + view)
     //getting calendar to input events
     const targetCalendar = globalCalendarsArray['cal-' + view]
-    const data = fetchFilteredData(filters)
+
     console.log('data ktora dostalem', data)
     for (let id in data) {
 
@@ -261,7 +264,6 @@ function handleFiltersClearing(event) {
     setFilterValue('end', viewNumber, "")
 
     updateUrlFilters(viewNumber)
-
 
 
 }
