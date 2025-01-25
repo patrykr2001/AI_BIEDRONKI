@@ -8,14 +8,23 @@ const Endpoints = {
 
 function fetchFilteredData(filters, _callback, view) {
     console.log('getting data')
+    let start = ''
+    let end = ''
+    try {
+        start = new Date(filters[5].split('-').reverse().join('-') + 'T00:00:00').toISOString()
+        end = new Date(filters[6].split('-').reverse().join('-') + 'T23:59:59').toISOString()
+    } catch (error) {
+        console.log('Failed to parse date from filters.' + error.message)
+    }
+
     let namedFilters = {
         Teacher: filters[0],
         Room: filters[1],
         Subject: filters[2],
         Group: filters[3],
         Student: filters[4],
-        Start: filters[5],
-        End: filters[6]
+        startDate: start,
+        endDate: end
     }
     const data = []
     fetchRecordsFromAPI(namedFilters).then((data) => {
@@ -94,11 +103,11 @@ function getWeekStartAndEndDates() {
 }
 
 function lessonSlug(filters) {
+    console.log(filters)
     let slug = ''
-    //TODO: Pobieranie daty z filtrów
-    let date = getWeekStartAndEndDates()
-
-    slug += 'startDate' + '=' + date.startOfWeek.toISOString() + '&endDate=' + date.endOfWeek.toISOString() + '&'
+    // let date = getWeekStartAndEndDates()
+    //
+    // slug += 'startDate' + '=' + date.startOfWeek.toISOString() + '&endDate=' + date.endOfWeek.toISOString() + '&'
 
     for (let filter in filters) {
         if (filters[filter] !== null) {

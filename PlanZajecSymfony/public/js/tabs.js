@@ -1,16 +1,15 @@
-
-function renderNewCalendar(calendarDivId){
+function renderNewCalendar(calendarDivId) {
 
 
     const calendarEl = document.getElementById(calendarDivId);
 
     const calendar = new FullCalendar.Calendar(calendarEl, {
-        headerToolbar:{
+        headerToolbar: {
             start: 'listDay,dayGridWeek,dayGridMonth',
             center: 'title',
             end: 'prev,today,next'
         },
-        buttonText:{
+        buttonText: {
             today: 'dziś',
             listDay: 'dzień',
             dayGridWeek: 'tydzień',
@@ -18,13 +17,7 @@ function renderNewCalendar(calendarDivId){
 
         },
         initialView: 'dayGridMonth',
-        events: [
-            {
-                id: 'a',
-                title: 'my event',
-                start: '2025-01-23'
-            }
-        ]
+        events: []
     });
 
     calendar.render();
@@ -32,16 +25,15 @@ function renderNewCalendar(calendarDivId){
     globalCalendarsArray[calendarDivId] = calendar
 
 
-
 }
 
-function handleAddTabClick(){
+function handleAddTabClick() {
 
     const container = document.getElementById('tabs-bar');
     let lastValue;
-    if( container.childElementCount === 1){
+    if (container.childElementCount === 1) {
         lastValue = 0
-    }else{
+    } else {
         lastValue = parseInt(container.lastElementChild.previousElementSibling.textContent)
     }
 
@@ -57,7 +49,7 @@ function handleTabClick(event) {
 
 }
 
-function switchToTab(tabElement){
+function switchToTab(tabElement) {
 
     const tabText = tabElement.textContent
     const targetCalendarId = 'cal-' + tabText;
@@ -87,7 +79,7 @@ function switchToTab(tabElement){
 
 }
 
-function createNewTab(tabNr){
+function createNewTab(tabNr) {
 
     let newTab = document.createElement('div');
     newTab.className = 'box calendar-tab';
@@ -100,18 +92,18 @@ function createNewTab(tabNr){
 
 }
 
-function createNewCalendar(calendarNr){
+function createNewCalendar(calendarNr) {
 
     let newCalendar = document.createElement('div');
     newCalendar.className = 'container calendar-slide';
-    newCalendar.id = ( 'cal-' + calendarNr.toString() );
+    newCalendar.id = ('cal-' + calendarNr.toString());
     newCalendar.style.zIndex = '1';
 
     return newCalendar
 
 }
 
-function createNewCalendarView(tabNr){
+function createNewCalendarView(tabNr) {
 
     const container = document.getElementById('tabs-bar');
 
