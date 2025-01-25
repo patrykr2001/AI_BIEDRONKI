@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Enum\LessonForms;
 use App\Enum\LessonStatuses;
 use App\Repository\LessonRepository;
+use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -14,64 +15,64 @@ class Lesson
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    public ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $startDate = null;
+    public ?DateTimeInterface $startDate = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $endDate = null;
+    public ?DateTimeInterface $endDate = null;
 
     #[ORM\Column]
-    private ?float $hours = null;
+    public ?float $hours = null;
 
     #[ORM\ManyToOne]
-    private ?Teacher $workerId = null;
+    public ?Teacher $workerId = null;
 
     #[ORM\ManyToOne]
-    private ?Teacher $workerCoverId = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?Group $groupId = null;
+    public ?Teacher $workerCoverId = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true)]
-    private ?Room $roomId = null;
+    public ?Group $groupId = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true)]
-    private ?Subject $subjectId = null;
+    public ?Room $roomId = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    public ?Subject $subjectId = null;
 
     #[ORM\Column(nullable: true, enumType: LessonForms::class)]
-    private ?LessonForms $lessonForm = null;
+    public ?LessonForms $lessonForm = null;
 
     #[ORM\Column(enumType: LessonStatuses::class)]
-    private ?LessonStatuses $lessonStatus = null;
+    public ?LessonStatuses $lessonStatus = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getStartDate(): ?\DateTimeInterface
+    public function getStartDate(): ?DateTimeInterface
     {
         return $this->startDate;
     }
 
-    public function setStartDate(\DateTimeInterface $startDate): static
+    public function setStartDate(DateTimeInterface $startDate): static
     {
         $this->startDate = $startDate;
 
         return $this;
     }
 
-    public function getEndDate(): ?\DateTimeInterface
+    public function getEndDate(): ?DateTimeInterface
     {
         return $this->endDate;
     }
 
-    public function setEndDate(\DateTimeInterface $endDate): static
+    public function setEndDate(DateTimeInterface $endDate): static
     {
         $this->endDate = $endDate;
 

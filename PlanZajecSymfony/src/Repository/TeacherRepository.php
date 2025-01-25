@@ -16,7 +16,8 @@ class TeacherRepository extends ServiceEntityRepository
         parent::__construct($registry, Teacher::class);
     }
 
-    public function clearCache(): void{
+    public function clearCache(): void
+    {
         $_em = $this->getEntityManager();
         $_em->clear();
     }
@@ -55,14 +56,13 @@ class TeacherRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
-    public function findTeacherByNameGetId(string $name): ?Teacher
+    public function findTeacherByNameGetId(string $name): ?string
     {
         return $this->createQueryBuilder('t')
-            ->select('t.id')
             ->andWhere('t.name = :name')
             ->setParameter('name', $name)
             ->getQuery()
-            ->getOneOrNullResult();
+            ->getOneOrNullResult()->getId();
     }
 
     /**

@@ -12,6 +12,7 @@ use App\Repository\SubjectRepository;
 use App\Repository\TeacherRepository;
 use DateMalformedStringException;
 use DateTime;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,8 +28,11 @@ class ApiLessonController extends AbstractController
     private SubjectRepository $subjectRepository;
     private GroupRepository $groupRepository;
     private RoomRepository $roomRepository;
+    private LoggerInterface $logger;
 
-    public function __construct(StudentRepository $studentRepository, LessonRepository $lessonRepository, TeacherRepository $teacherRepository, SubjectRepository $subjectRepository, GroupRepository $groupRepository, RoomRepository $roomRepository)
+    public function __construct(StudentRepository $studentRepository, LessonRepository $lessonRepository,
+                                TeacherRepository $teacherRepository, SubjectRepository $subjectRepository,
+                                GroupRepository   $groupRepository, RoomRepository $roomRepository, LoggerInterface $logger)
     {
         $this->studentRepository = $studentRepository;
         $this->lessonRepository = $lessonRepository;
@@ -36,6 +40,7 @@ class ApiLessonController extends AbstractController
         $this->subjectRepository = $subjectRepository;
         $this->groupRepository = $groupRepository;
         $this->roomRepository = $roomRepository;
+        $this->logger = $logger;
     }
 
     #[Route('/api/lessons', methods: ['GET'])]
@@ -51,37 +56,78 @@ class ApiLessonController extends AbstractController
         } catch (DateMalformedStringException $e) {
             return new JsonResponse("Invalid end date", Response::HTTP_BAD_REQUEST);
         }
-        $teacher = $request->query->get('teacher', '');
-        $subject = $request->query->get('subject', '');
-        $group = $request->query->get('group', '');
-        $room = $request->query->get('room', '');
-        $student = $request->query->get('student', '');
+        $teacher = $request->query->get('Teacher', '');
+        $subject = $request->query->get('Subject', '');
+        $group = $request->query->get('Group', '');
+        $room = $request->query->get('Room', '');
+        $student = $request->query->get('Student', '');
+
+        if ($teacher == "" && $subject == "" && $group == "" && $room == "" && $student == "") {
+            return new JsonResponse("[]", Response::HTTP_BAD_REQUEST);
+        }
 
         if ($teacher != "") {
-            $teacher = "%" . $teacher . "%";
-            $teacher = $this->teacherRepository->findTeacherByNameGetId($teacher);
+            $this->logger->info("Teacher: " . $teacher);
+            $teacher = $this->teacherRepository->findTeacherByNameGetId($teacher) ?? "";
         }
         if ($subject != "") {
-            $subject = "%" . $subject . "%";
-            $subject = $this->subjectRepository->findSubjectByNameGetID($subject);
+            $subject = $this->subjectRepository->findSubjectByNameGetID($subject) ?? "";
         }
         if ($group != "") {
-            $group = "%" . $group . "%";
-            $group = $this->groupRepository->findGroupByNameGetId($group);
+            $group = $this->groupRepository->findGroupByNameGetId($group) ?? "";
         }
 
         if ($room != "") {
-            $room = "%" . $room . "%";
-            $room = $this->roomRepository->findRoomByNameGetId($room);
+            $room = $this->roomRepository->findRoomByNameGetId($room) ?? "";
         }
 
         if ($student != "") {
-            $student = "%" . $student . "%";
-            $group = $this->studentRepository->findGroupIB($student);
+            $group = $this->studentRepository->findGroupIB($student) ?? "";
         }
 
-        $data = $this->lessonRepository->findLessonAPI($teacher, $subject, $group, $room, $start, $end);
-        $data = json_encode($data);
-        return new JsonResponse($data, Response::HTTP_OK);
+        if ($teacher == "" && $subject == "" && $group == "" && $room == "" && $student == "") {
+            return new JsonResponse("[]", Response::HTTP_BAD_REQUEST);
+        }
+
+        $data = $this->lessonRepository->findLessonAPI($teacher, $subject, $group == "" ? [] : $group, $room, $start, $end);
+
+        $json = "[";
+
+        foreach ($data as $lesson) {
+            $str = "{";
+            $str .= "\"id\": " . $lesson->getId() . ",";
+            $str .= "\"startDate\": \"" . $lesson->getStartDate()->format('Y-m-d H:i:s') . "\",";
+            $str .= "\"endDate\": \"" . $lesson->getEndDate()->format('Y-m-d H:i:s') . "\",";
+            $str .= "\"hours\": " . $lesson->getHours() . ",";
+            $str .= "\"worker\": \"" . $lesson->getWorkerId()->getName() . "\",";
+            if ($lesson->getWorkerCoverId() != null)
+                $str .= "\"workerCover\": \"" . $lesson->getWorkerCoverId()->getName() . "\",";
+            else
+                $str .= "\"workerCover\": \"\",";
+            if ($lesson->getGroupId() != null)
+                $str .= "\"group\": \"" . $lesson->getGroupId()->getName() . "\",";
+            else
+                $str .= "\"group\": \"\",";
+            if ($lesson->getRoomId() != null)
+                $str .= "\"room\": \"" . $lesson->getRoomId()->getName() . "\",";
+            else
+                $str .= "\"room\": \"\",";
+            if ($lesson->getSubjectId() != null)
+                $str .= "\"subject\": \"" . $lesson->getSubjectId()->getName() . "\",";
+            else
+                $str .= "\"subject\": \"\",";
+            if ($lesson->getLessonForm() != null)
+                $str .= "\"lessonForm\": \"" . $lesson->getLessonForm()->value . "\",";
+            else
+                $str .= "\"lessonForm\": \"\",";
+            $str .= "\"lessonStatus\": \"" . $lesson->getLessonStatus()->value . "\"";
+            $str .= "},";
+            $json .= $str;
+        }
+
+        $json = substr($json, 0, -1);
+        $json .= "]";
+
+        return new JsonResponse($json, Response::HTTP_OK, ['content-type' => 'application/json'], true);
     }
 }

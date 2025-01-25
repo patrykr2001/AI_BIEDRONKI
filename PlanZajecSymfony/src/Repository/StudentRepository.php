@@ -40,14 +40,14 @@ class StudentRepository extends ServiceEntityRepository
     }
 
 
-    public function findGroupIB(string $name): ?Student
+    public function findGroupIB(string $name): array
     {
         return $this->createQueryBuilder('s')
             ->select('s.groupId')
             ->andWhere('s.name = :name')
             ->setParameter('name', $name)
             ->getQuery()
-            ->getResults();
+            ->getResult();
     }
 
     /**

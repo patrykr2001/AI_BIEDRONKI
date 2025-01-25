@@ -16,7 +16,8 @@ class RoomRepository extends ServiceEntityRepository
         parent::__construct($registry, Room::class);
     }
 
-    public function clearCache(): void{
+    public function clearCache(): void
+    {
         $_em = $this->getEntityManager();
         $_em->clear();
     }
@@ -55,14 +56,14 @@ class RoomRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
-    public function findRoomByNameGetId(string $name): ?Room
+    public function findRoomByNameGetId(string $name): ?string
     {
         return $this->createQueryBuilder('r')
             ->select('r.id')
             ->andWhere('r.name = :name')
             ->setParameter('name', $name)
             ->getQuery()
-            ->getOneOrNullResult();
+            ->getOneOrNullResult()->getId();
     }
 
     /**

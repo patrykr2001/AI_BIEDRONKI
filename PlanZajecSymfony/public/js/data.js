@@ -18,6 +18,7 @@ function fetchFilteredData(filters) {
     const data = []
     fetchRecordsFromAPI(namedFilters).then((data) => {
         this.data = data
+        console.log(data);
     })
     return parseDataIntoEvents(data)
 }

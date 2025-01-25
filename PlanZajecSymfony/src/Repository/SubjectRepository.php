@@ -16,7 +16,8 @@ class SubjectRepository extends ServiceEntityRepository
         parent::__construct($registry, Subject::class);
     }
 
-    public function clearCache(): void{
+    public function clearCache(): void
+    {
         $_em = $this->getEntityManager();
         $_em->clear();
     }
@@ -44,7 +45,6 @@ class SubjectRepository extends ServiceEntityRepository
     }
 
 
-
     /**
      * @return Subject|null Returns a Subject object or null
      */
@@ -57,14 +57,14 @@ class SubjectRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
-    public function findSubjectByNameGetID(string $name): ?Subject
+    public function findSubjectByNameGetID(string $name): ?string
     {
         return $this->createQueryBuilder('s')
             ->select('s.id')
             ->andWhere('s.name = :name')
             ->setParameter('name', $name)
             ->getQuery()
-            ->getOneOrNullResult();
+            ->getOneOrNullResult()->getId();
     }
 
     /**
