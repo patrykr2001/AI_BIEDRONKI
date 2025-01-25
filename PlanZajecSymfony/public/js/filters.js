@@ -42,6 +42,9 @@ function insertNewFiltersContainer(viewNumber) {
 
     const filterButton = document.getElementById('filter-button-' + viewNumber)
 
+    const clearFiltersButton = document.getElementById('clean-filters-button-' + viewNumber)
+    clearFiltersButton.addEventListener('click', handleFiltersClearing)
+
     filterButton.addEventListener('click', handleFiltering)
 
     console.log('view', viewNumber)
@@ -241,4 +244,22 @@ function inputDataIntoView(view, filters) {
         targetCalendar.addEvent(data[id])
         targetCalendar.render()
     }
+}
+
+function handleFiltersClearing(event) {
+
+    const targetButton = event.target
+    const [filter, button, clear, viewNumber] = targetButton.id.split('-')
+    setFilterValue('wykladowca', viewNumber, "")
+    setFilterValue('sala', viewNumber, "")
+    setFilterValue('przedmiot', viewNumber, "")
+    setFilterValue('grupa', viewNumber, "")
+    setFilterValue('album', viewNumber, "")
+    setFilterValue('start', viewNumber, "")
+    setFilterValue('end', viewNumber, "")
+
+    updateUrlFilters(viewNumber)
+
+
+
 }
