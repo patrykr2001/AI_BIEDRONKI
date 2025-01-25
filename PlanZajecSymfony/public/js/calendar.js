@@ -13,6 +13,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     filterButton.addEventListener('click', handleFiltering);
 
+    flatpickr(`#start-input-1`,
+        {
+            dateFormat: "d-m-Y"
+        }
+    );
+
+    flatpickr(`#end-input-1`,
+        {
+            dateFormat: "d-m-Y"
+        }
+    );
+
     // renderNewCalendar('calendar-1');
 
     parseUrlParams(urlParams);

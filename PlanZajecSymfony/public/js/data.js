@@ -13,7 +13,9 @@ function fetchFilteredData(filters) {
         Room: filters[1],
         Subject: filters[2],
         Group: filters[3],
-        Student: filters[4]
+        Student: filters[4],
+        Start: filters[5],
+        End: filters[6]
     }
     const data = []
     fetchRecordsFromAPI(namedFilters).then((data) => {
