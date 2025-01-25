@@ -82,7 +82,7 @@ class ApiLessonController extends AbstractController
         }
 
         if ($student != "") {
-            $group = $this->studentRepository->findGroupIB($student) ?? "";
+            $group = $this->studentRepository->findStudentByNumber($student)->getGroupId()->toArray() ?? "";
         }
 
         if ($teacher == "" && $subject == "" && $group == "" && $room == "" && $student == "") {

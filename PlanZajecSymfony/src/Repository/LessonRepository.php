@@ -111,7 +111,7 @@ class LessonRepository extends ServiceEntityRepository
                 ->setParameter('subject', $subject);
         }
         if ($group != "" && count($group) > 0) {
-            $q->andWhere('l.groupId IN :group')
+            $q->andWhere('l.groupId IN (:group)')
                 ->setParameter('group', $group);
         }
         if ($room != "") {
