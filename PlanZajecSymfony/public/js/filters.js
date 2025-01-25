@@ -24,11 +24,13 @@ function insertNewFiltersContainer(viewNumber) {
             <div class="input-group mb-1">
                 <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" id="album-input-${viewNumber}">
             </div>
+            <p class="text-start mb-1">Od</p>
             <div class="input-group mb-1">
-                 <input type="date" id="start-input-${viewNumber}">
+                 <input type="date" class="form-control" id="start-input-${viewNumber}">
             </div>
+            <p class="text-start mb-1">Do</p>
             <div class="input-group mb-1">
-                 <input type="date" id="end-input-${viewNumber}">
+                 <input type="date" class="form-control" id="end-input-${viewNumber}">
             </div>
             <div class="text-center">
                 <button class="btn btn-primary" id="filter-button-${viewNumber}">Wyszukaj</button>
