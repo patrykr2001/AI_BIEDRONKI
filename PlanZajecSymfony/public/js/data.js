@@ -6,7 +6,7 @@ const Endpoints = {
     Lessons: '/api/lessons',
 }
 
-function fetchFilteredData(filters) {
+function fetchFilteredData(filters, _callback, view) {
     console.log('getting data')
     let namedFilters = {
         Teacher: filters[0],
@@ -19,10 +19,8 @@ function fetchFilteredData(filters) {
     }
     const data = []
     fetchRecordsFromAPI(namedFilters).then((data) => {
-        this.data = data
-        console.log(data);
+        _callback(parseDataIntoEvents(data), view)
     })
-    return parseDataIntoEvents(data)
 }
 
 function parseDataIntoEvents(fetchedRecords) {
@@ -51,58 +49,14 @@ function parseDataIntoEvents(fetchedRecords) {
         case Exception = 'wyjątek';
     }
     */
-    //TODO: wywalić jak API będzie działać
-    //example data
-    fetchedRecords = [
-        {
-            id: 0,
-            startDate: '2025-01-21T14:30',
-            endDate: '2025-01-21T16:00',
-            hours: 2.0,
-            worker: 'Karczmarczyk',
-            workerCover: null,
-            group: '1',
-            room: '245',
-            subject: 'Programowanie komputerów 1',
-            lessonForm: 'wykład',
-            lessonStatus: 'normalne'
-        }, {
-            id: 1,
-            startDate: '2025-01-22T14:30',
-            endDate: '2025-01-22T16:00',
-            hours: 2.0,
-            worker: 'Karczmarczyk',
-            workerCover: null,
-            group: '1',
-            room: '245',
-            subject: 'Programowanie komputerów 1',
-            lessonForm: 'wykład',
-            lessonStatus: 'normalne'
-        },
-        {
-            id: '2',
-            startDate: '2025-01-23T14:30',
-            endDate: '2025-01-23T16:00',
-            hours: 2.0,
-            worker: 'Karczmarczyk',
-            workerCover: null,
-            group: '1',
-            room: '245',
-            subject: 'Programowanie komputerów 1',
-            lessonForm: 'wykład',
-            lessonStatus: 'normalne'
-        }
-    ]
 
     let events = []
 
     for (let record in fetchedRecords) {
-
         console.log('dostalem record: ', record)
         events.push(recordToEvent(fetchedRecords[record]))
     }
 
-    console.log(events)
     return events
 }
 
@@ -111,7 +65,8 @@ function recordToEvent(record) {
     let event = {
         // id: record['id'],
         title: record['worker'] + ' ' + record['subject'],
-        start: record['startDate']
+        start: record['startDate'],
+        end: record['endDate'],
     }
 
     console.log('stworzylem event: ', event)

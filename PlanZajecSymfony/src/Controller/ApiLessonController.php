@@ -96,8 +96,8 @@ class ApiLessonController extends AbstractController
         foreach ($data as $lesson) {
             $str = "{";
             $str .= "\"id\": " . $lesson->getId() . ",";
-            $str .= "\"startDate\": \"" . $lesson->getStartDate()->format('Y-m-d H:i:s') . "\",";
-            $str .= "\"endDate\": \"" . $lesson->getEndDate()->format('Y-m-d H:i:s') . "\",";
+            $str .= "\"startDate\": \"" . $lesson->getStartDate()->format('Y-m-d') . 'T' . $lesson->getStartDate()->format('H:i') . "\",";
+            $str .= "\"endDate\": \"" . $lesson->getEndDate()->format('Y-m-d') . 'T' . $lesson->getEndDate()->format('H:i') . "\",";
             $str .= "\"hours\": " . $lesson->getHours() . ",";
             $str .= "\"worker\": \"" . $lesson->getWorkerId()->getName() . "\",";
             if ($lesson->getWorkerCoverId() != null)
